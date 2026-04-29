@@ -309,117 +309,295 @@
       background: rgba(255,255,255,0.2);
     }
 
-    /* Perfil modal */
-    #profile-modal {
+    /* Perfil AAA */
+    #profile-overlay {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0,0,0,0.9);
-      z-index: 100;
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      pointer-events: auto;
+      background: rgba(0,0,0,0.95);
+      z-index: 200;
+      display: flex;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
       backdrop-filter: blur(20px);
     }
-    #profile-modal.active {
+    #profile-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .profile-container {
       display: flex;
+      width: 100%;
+      height: 100%;
+      gap: 0;
     }
-    .profile-card {
-      background: rgba(20,20,35,0.95);
-      border-radius: 25px;
-      padding: 25px;
-      width: 90%;
-      max-width: 380px;
-      text-align: center;
-      border: 2px solid rgba(255,215,0,0.5);
-      box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+    
+    /* Columna izquierda */
+    .profile-sidebar {
+      width: 260px;
+      background: rgba(15,15,25,0.95);
+      border-right: 1px solid rgba(255,215,0,0.2);
+      padding: 20px 0;
+      display: flex;
+      flex-direction: column;
+      backdrop-filter: blur(10px);
+      overflow-y: auto;
     }
-    .profile-avatar-large {
-      width: 90px;
-      height: 90px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #ff6b35, #f7c948);
+    .sidebar-menu-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 20px;
+      color: #999;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border-left: 3px solid transparent;
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+    }
+    .sidebar-menu-item svg {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+      opacity: 0.7;
+      transition: all 0.3s;
+    }
+    .sidebar-menu-item:hover {
+      color: #ffd700;
+      background: rgba(255,215,0,0.05);
+      border-left-color: #ffd700;
+    }
+    .sidebar-menu-item:hover svg {
+      opacity: 1;
+      filter: drop-shadow(0 0 6px rgba(255,215,0,0.6));
+    }
+    .sidebar-menu-item.active {
+      color: #ffd700;
+      background: rgba(255,215,0,0.1);
+      border-left-color: #ff8800;
+    }
+    .sidebar-menu-item.active svg {
+      opacity: 1;
+      filter: drop-shadow(0 0 10px rgba(255,136,0,0.8));
+    }
+    
+    /* Columna central */
+    .profile-center {
+      flex: 1;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 45px;
-      border: 3px solid white;
-      margin: 0 auto 15px;
+      background: radial-gradient(circle at center, rgba(255,136,0,0.08) 0%, transparent 60%);
+      position: relative;
     }
-    .profile-name-large {
-      color: white;
-      font-size: 24px;
-      font-weight: 900;
-      letter-spacing: 2px;
+    .character-stage {
+      width: 100%;
+      height: 100%;
+      position: relative;
     }
-    .profile-uid {
-      color: #aaa;
-      font-size: 13px;
-      margin: 5px 0;
+    #profile-canvas-container {
+      width: 100%;
+      height: 100%;
     }
-    .profile-stats {
+    
+    /* Columna derecha */
+    .profile-right {
+      width: 340px;
+      background: rgba(15,15,25,0.95);
+      border-left: 1px solid rgba(255,215,0,0.2);
+      padding: 20px;
+      overflow-y: auto;
       display: flex;
-      justify-content: space-around;
-      margin: 20px 0;
-      gap: 10px;
+      flex-direction: column;
+      gap: 16px;
     }
-    .stat-item {
+    .profile-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .profile-avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ff6b35, #f7c948);
+      border: 2px solid #ffd700;
+      flex-shrink: 0;
+    }
+    .profile-info-right h3 {
       color: white;
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .profile-info-right .uid {
+      color: #999;
+      font-size: 11px;
+    }
+    .profile-info-right .lang {
+      color: #aaa;
+      font-size: 10px;
+      margin-top: 2px;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .stat-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 14px;
       text-align: center;
+      transition: all 0.3s;
+      cursor: default;
+    }
+    .stat-card:hover {
+      border-color: rgba(255,215,0,0.4);
+      box-shadow: 0 0 20px rgba(255,215,0,0.1);
+      transform: translateY(-2px);
     }
     .stat-value {
-      font-size: 22px;
+      font-size: 24px;
       font-weight: 900;
       color: #ffd700;
     }
     .stat-label {
       font-size: 10px;
-      color: #aaa;
+      color: #999;
       text-transform: uppercase;
-    }
-    .profile-badge {
-      display: inline-block;
-      background: linear-gradient(45deg, #ff6600, #ff9900);
-      color: white;
-      padding: 6px 15px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: bold;
-      margin: 5px;
-    }
-    .close-profile {
-      background: #ff4444;
-      color: white;
-      border: none;
-      padding: 12px 30px;
-      border-radius: 25px;
-      font-weight: bold;
-      font-size: 16px;
-      margin-top: 15px;
-      cursor: pointer;
       letter-spacing: 1px;
+      margin-top: 4px;
     }
-    .close-profile:active {
-      transform: scale(0.95);
-      background: #cc0000;
+    .medals-section h4 {
+      color: #ffd700;
+      font-size: 13px;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+    .medals-grid {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .medal {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      position: relative;
+    }
+    .medal:hover {
+      transform: scale(1.2);
+    }
+    .medal.bronze {
+      background: radial-gradient(circle, #cd7f32, #8b5a2b);
+      box-shadow: 0 0 12px rgba(205,127,50,0.4);
+    }
+    .medal.silver {
+      background: radial-gradient(circle, #c0c0c0, #808080);
+      box-shadow: 0 0 12px rgba(192,192,192,0.4);
+    }
+    .medal.gold {
+      background: radial-gradient(circle, #ffd700, #b8860b);
+      box-shadow: 0 0 16px rgba(255,215,0,0.6);
+    }
+    .medal.epic {
+      background: radial-gradient(circle, #9b59b6, #6c3483);
+      box-shadow: 0 0 20px rgba(155,89,182,0.7);
+      animation: epicGlow 2s infinite;
+    }
+    @keyframes epicGlow {
+      0%, 100% { box-shadow: 0 0 20px rgba(155,89,182,0.7); }
+      50% { box-shadow: 0 0 35px rgba(155,89,182,1); }
+    }
+    .medal.legendary {
+      background: radial-gradient(circle, #ff6600, #cc3300);
+      box-shadow: 0 0 25px rgba(255,102,0,0.8);
+      animation: legendGlow 1.5s infinite;
+    }
+    @keyframes legendGlow {
+      0%, 100% { box-shadow: 0 0 25px rgba(255,102,0,0.8); }
+      50% { box-shadow: 0 0 45px rgba(255,102,0,1.2); }
+    }
+    .close-profile-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 40px;
+      height: 40px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      color: white;
+      font-size: 20px;
+      cursor: pointer;
+      z-index: 210;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s;
+    }
+    .close-profile-btn:hover {
+      background: rgba(255,68,68,0.6);
+      border-color: #ff4444;
+    }
+    .medal-tooltip {
+      position: absolute;
+      bottom: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.9);
+      color: white;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 10px;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+    .medal:hover .medal-tooltip {
+      opacity: 1;
     }
 
-    @media (max-width: 380px) {
-      .menu-icon {
-        width: 40px;
-        height: 40px;
-        font-size: 18px;
+    @media (max-width: 768px) {
+      .profile-container {
+        flex-direction: column;
       }
-      .menu-item {
-        font-size: 8px;
+      .profile-sidebar {
+        width: 100%;
+        flex-direction: row;
+        overflow-x: auto;
+        padding: 10px;
+        gap: 5px;
       }
-      .currency-item {
-        padding: 5px 8px;
-        font-size: 10px;
+      .sidebar-menu-item {
+        padding: 10px 12px;
+        font-size: 11px;
+        border-left: none;
+        border-bottom: 2px solid transparent;
+        white-space: nowrap;
+      }
+      .sidebar-menu-item.active {
+        border-left: none;
+        border-bottom-color: #ff8800;
+      }
+      .profile-center {
+        height: 40vh;
+      }
+      .profile-right {
+        width: 100%;
+        flex: 1;
       }
     }
   </style>
@@ -434,95 +612,119 @@
   <div id="game-ui">
     <div class="top-bar" id="top-bar">
       <div class="profile-info" id="profile-trigger">
-        <div class="avatar-circle">😎</div>
+        <div class="avatar-circle">N</div>
         <div>
           <div class="player-name">Naomi</div>
           <div class="player-level">NvL 30 • UID:10292439675</div>
         </div>
       </div>
       <div class="currency">
-        <div class="currency-item" style="color:#00d4ff;">💎 2,571</div>
-        <div class="currency-item" style="color:#ffd700;">🪙 168</div>
+        <div class="currency-item" style="color:#00d4ff;">D 2,571</div>
+        <div class="currency-item" style="color:#ffd700;">G 168</div>
       </div>
     </div>
     
     <div class="chat-bar" id="chat-bar">
-      <span>💬</span>
       <span style="color:#ffcc00; font-weight:bold;">[Mundo]</span> 
-      <span>¡Invitación de grupo! • Mapa aleatorio</span>
+      <span>Invitacion de grupo - Mapa aleatorio</span>
     </div>
     
     <div class="bottom-panel" id="bottom-panel">
       <div class="menu-row">
-        <div class="menu-item" id="menu-tienda">
-          <div class="menu-icon">🛒</div>
-          <span>TIENDA</span>
-        </div>
-        <div class="menu-item" id="menu-luck">
-          <div class="menu-icon">🎰</div>
-          <span>LUCK ROYALE</span>
-        </div>
-        <div class="menu-item" id="menu-pase">
-          <div class="menu-icon">👑</div>
-          <span>PASE BOOYAH</span>
-        </div>
-        <div class="menu-item" id="menu-misiones">
-          <div class="menu-icon">📋</div>
-          <span>MISIONES</span>
-        </div>
-        <div class="menu-item" id="menu-eventos">
-          <div class="menu-icon">🎪</div>
-          <span>EVENTOS</span>
-        </div>
+        <div class="menu-item" id="menu-tienda"><div class="menu-icon">T</div><span>TIENDA</span></div>
+        <div class="menu-item" id="menu-luck"><div class="menu-icon">L</div><span>LUCK ROYALE</span></div>
+        <div class="menu-item" id="menu-pase"><div class="menu-icon">P</div><span>PASE BOOYAH</span></div>
+        <div class="menu-item" id="menu-misiones"><div class="menu-icon">M</div><span>MISIONES</span></div>
+        <div class="menu-item" id="menu-eventos"><div class="menu-icon">E</div><span>EVENTOS</span></div>
       </div>
-      <button class="start-btn" id="start-btn">▶ INICIAR PARTIDA</button>
+      <button class="start-btn" id="start-btn">INICIAR PARTIDA</button>
     </div>
     
     <div id="plane-hud">
-      <div style="font-size: 20px; animation: pulse 0.8s infinite;">✈️ PRESIONA SALTAR ✈️</div>
+      <div style="font-size: 20px; animation: pulse 0.8s infinite;">PRESIONA SALTAR</div>
       <div style="font-size: 12px; color: #ffcc00;">Elige tu zona de aterrizaje</div>
     </div>
     
-    <div id="joystick-container">
-      <div id="joystick-base"><div id="joystick-thumb"></div></div>
-    </div>
+    <div id="joystick-container"><div id="joystick-base"><div id="joystick-thumb"></div></div></div>
     <div id="jump-btn">SALTAR</div>
-    <div id="minimap-container">
-      <canvas id="minimap-canvas" width="110" height="110"></canvas>
-    </div>
-    
-    <div id="music-toggle">🔇</div>
+    <div id="minimap-container"><canvas id="minimap-canvas" width="110" height="110"></canvas></div>
+    <div id="music-toggle">M</div>
   </div>
 
-  <!-- Modal de perfil -->
-  <div id="profile-modal">
-    <div class="profile-card">
-      <div class="profile-avatar-large">😎</div>
-      <div class="profile-name-large">Naomi</div>
-      <div class="profile-uid">UID: 10292439675</div>
-      <div style="margin: 10px 0;">
-        <span class="profile-badge">⚔️ HEROICO</span>
-        <span class="profile-badge">🎯 TIRADOR</span>
-        <span class="profile-badge">👺 UWU</span>
-      </div>
-      <div class="profile-stats">
-        <div class="stat-item">
-          <div class="stat-value">2,694</div>
-          <div class="stat-label">Juegos</div>
+  <!-- PERFIL AAA -->
+  <div id="profile-overlay">
+    <button class="close-profile-btn" id="close-profile-btn">X</button>
+    <div class="profile-container">
+      <!-- Columna izquierda -->
+      <div class="profile-sidebar">
+        <div class="sidebar-menu-item active" data-section="resumen">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          Resumen
         </div>
-        <div class="stat-item">
-          <div class="stat-value">550</div>
-          <div class="stat-label">Kills</div>
+        <div class="sidebar-menu-item" data-section="galeria">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          Galeria
         </div>
-        <div class="stat-item">
-          <div class="stat-value">NvL 30</div>
-          <div class="stat-label">Nivel</div>
+        <div class="sidebar-menu-item" data-section="rol">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Rol
+        </div>
+        <div class="sidebar-menu-item" data-section="juegos">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Juegos
+        </div>
+        <div class="sidebar-menu-item" data-section="armas">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          Armas
+        </div>
+        <div class="sidebar-menu-item" data-section="album">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+          Album
+        </div>
+        <div class="sidebar-menu-item" data-section="honor">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          Puntuacion de Honor
+        </div>
+        <div class="sidebar-menu-item" data-section="deseos">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          Lista de Deseos
         </div>
       </div>
-      <div style="color: #aaa; font-size: 12px; margin: 10px 0;">
-        📊 Puntuación de Honor • Lista de deseos 4D
+      
+      <!-- Columna central -->
+      <div class="profile-center">
+        <div class="character-stage" id="profile-canvas-container"></div>
       </div>
-      <button class="close-profile" id="close-profile">CERRAR</button>
+      
+      <!-- Columna derecha -->
+      <div class="profile-right">
+        <div class="profile-header">
+          <div class="profile-avatar"></div>
+          <div class="profile-info-right">
+            <h3>Naomi</h3>
+            <div class="uid">UID: 10292439675</div>
+            <div class="lang">Espanol</div>
+          </div>
+        </div>
+        
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-value">2,694</div><div class="stat-label">Partidas</div></div>
+          <div class="stat-card"><div class="stat-value">550</div><div class="stat-label">Kills</div></div>
+          <div class="stat-card"><div class="stat-value">68%</div><div class="stat-label">Win Rate</div></div>
+          <div class="stat-card"><div class="stat-value">4.2</div><div class="stat-label">K/D</div></div>
+        </div>
+        
+        <div class="medals-section">
+          <h4>Medallas de Pase</h4>
+          <div class="medals-grid">
+            <div class="medal bronze"><span style="font-size:18px;color:white;">B</span><div class="medal-tooltip">Bronce - Temporada 1</div></div>
+            <div class="medal silver"><span style="font-size:18px;color:white;">S</span><div class="medal-tooltip">Plata - Temporada 2</div></div>
+            <div class="medal gold"><span style="font-size:18px;color:white;">G</span><div class="medal-tooltip">Oro - Temporada 3</div></div>
+            <div class="medal epic"><span style="font-size:18px;color:white;">E</span><div class="medal-tooltip">Epico - Evento Especial</div></div>
+            <div class="medal legendary"><span style="font-size:18px;color:white;">L</span><div class="medal-tooltip">Legendario - Top 100</div></div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -558,7 +760,6 @@
     
     const ambientLight = new THREE.AmbientLight(0x8899aa, 0.7);
     scene.add(ambientLight);
-    
     const sunLight = new THREE.DirectionalLight(0xfff5e6, 1.4);
     sunLight.position.set(60, 50, 40);
     sunLight.castShadow = true;
@@ -567,14 +768,7 @@
     sunLight.shadow.mapSize.height = 2048;
     sunLight.shadow.camera.near = 1;
     sunLight.shadow.camera.far = 250;
-    sunLight.shadow.camera.left = -70;
-    sunLight.shadow.camera.right = 70;
-    sunLight.shadow.camera.top = 70;
-    sunLight.shadow.camera.bottom = -70;
     scene.add(sunLight);
-    
-    const hemisphereLight = new THREE.HemisphereLight(0x87CEEB, 0x3a5a3a, 0.5);
-    scene.add(hemisphereLight);
     
     let lobbyModel, playerModel, parachuteModel, planeGroup;
     let localPlayer = {
@@ -584,7 +778,6 @@
       parachuteOpen: false,
       onGround: false
     };
-    
     let cameraYaw = 0, cameraPitch = 0.2;
     let moveInput = { x: 0, y: 0 };
     let joystickActive = false, joystickId = null;
@@ -604,50 +797,106 @@
     const planeHud = document.getElementById('plane-hud');
     const musicToggle = document.getElementById('music-toggle');
     const bgMusic = document.getElementById('bg-music');
-    const profileModal = document.getElementById('profile-modal');
+    const profileOverlay = document.getElementById('profile-overlay');
     const profileTrigger = document.getElementById('profile-trigger');
-    const closeProfile = document.getElementById('close-profile');
+    const closeProfileBtn = document.getElementById('close-profile-btn');
     
-    // Perfil
-    profileTrigger.addEventListener('click', (e) => {
-      e.stopPropagation();
-      profileModal.classList.add('active');
-    });
+    // Perfil AAA
+    let profileScene, profileCamera, profileRenderer, profileModel;
     
-    closeProfile.addEventListener('click', () => {
-      profileModal.classList.remove('active');
-    });
+    function initProfileScene() {
+      const container = document.getElementById('profile-canvas-container');
+      profileScene = new THREE.Scene();
+      profileScene.background = new THREE.Color(0x0a0a14);
+      
+      profileCamera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.5, 100);
+      profileCamera.position.set(0, 2.5, 5);
+      
+      profileRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      profileRenderer.setSize(container.clientWidth, container.clientHeight);
+      profileRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      profileRenderer.shadowMap.enabled = true;
+      container.appendChild(profileRenderer.domElement);
+      
+      const light1 = new THREE.DirectionalLight(0xffd700, 1.2);
+      light1.position.set(3, 5, 3);
+      profileScene.add(light1);
+      const light2 = new THREE.DirectionalLight(0xff6600, 0.8);
+      light2.position.set(-3, 2, -2);
+      profileScene.add(light2);
+      
+      profileModel = createProfileCharacter();
+      profileModel.position.set(0, 0, 0);
+      profileScene.add(profileModel);
+      
+      const platform = new THREE.Mesh(
+        new THREE.CylinderGeometry(1.2, 1.4, 0.3, 32),
+        new THREE.MeshStandardMaterial({ color: 0x222233, roughness: 0.3, metalness: 0.8 })
+      );
+      platform.position.y = -1;
+      platform.receiveShadow = true;
+      profileScene.add(platform);
+      
+      const glowRing = new THREE.Mesh(
+        new THREE.TorusGeometry(1.3, 0.05, 16, 32),
+        new THREE.MeshStandardMaterial({ color: 0xff8800, emissive: new THREE.Color(0xff4400), roughness: 0.1 })
+      );
+      glowRing.position.y = -0.85;
+      glowRing.rotation.x = Math.PI/2;
+      profileScene.add(glowRing);
+      
+      animateProfile();
+    }
     
-    profileModal.addEventListener('click', (e) => {
-      if (e.target === profileModal) {
-        profileModal.classList.remove('active');
+    function createProfileCharacter() {
+      const group = new THREE.Group();
+      const bodyGeo = new THREE.CylinderGeometry(0.4, 0.5, 1.6, 8);
+      const body = new THREE.Mesh(bodyGeo, new THREE.MeshStandardMaterial({ color: 0xff6600, roughness: 0.2, metalness: 0.3 }));
+      body.position.y = 0.9;
+      group.add(body);
+      const headGeo = new THREE.SphereGeometry(0.42, 24, 24);
+      const head = new THREE.Mesh(headGeo, new THREE.MeshStandardMaterial({ color: 0xffccaa, roughness: 0.2 }));
+      head.position.y = 1.9;
+      group.add(head);
+      return group;
+    }
+    
+    function animateProfile() {
+      requestAnimationFrame(animateProfile);
+      if (profileModel) {
+        profileModel.rotation.y += 0.005;
       }
+      if (profileRenderer && profileScene && profileCamera) {
+        profileRenderer.render(profileScene, profileCamera);
+      }
+    }
+    
+    profileTrigger.addEventListener('click', () => {
+      profileOverlay.classList.add('active');
+      if (!profileScene) initProfileScene();
+    });
+    
+    closeProfileBtn.addEventListener('click', () => {
+      profileOverlay.classList.remove('active');
+    });
+    
+    // Sidebar navigation
+    document.querySelectorAll('.sidebar-menu-item').forEach(item => {
+      item.addEventListener('click', () => {
+        document.querySelectorAll('.sidebar-menu-item').forEach(i => i.classList.remove('active'));
+        item.classList.add('active');
+      });
     });
     
     // Música
     let isMusicPlaying = false;
     bgMusic.volume = 0.4;
-    
     function toggleMusic() {
-      if (isMusicPlaying) {
-        bgMusic.pause();
-        musicToggle.textContent = '🔇';
-        isMusicPlaying = false;
-      } else {
-        bgMusic.play().catch(() => {});
-        musicToggle.textContent = '🔊';
-        isMusicPlaying = true;
-      }
+      if (isMusicPlaying) { bgMusic.pause(); musicToggle.textContent = 'M'; isMusicPlaying = false; }
+      else { bgMusic.play().catch(() => {}); musicToggle.textContent = 'S'; isMusicPlaying = true; }
     }
-    
     musicToggle.addEventListener('click', toggleMusic);
-    bgMusic.play().then(() => {
-      isMusicPlaying = true;
-      musicToggle.textContent = '🔊';
-    }).catch(() => {
-      isMusicPlaying = false;
-      musicToggle.textContent = '🔇';
-    });
+    bgMusic.play().then(() => { isMusicPlaying = true; musicToggle.textContent = 'S'; }).catch(() => {});
     
     function createProCharacter(skinColor = 0xff6600) {
       const group = new THREE.Group();
@@ -778,13 +1027,6 @@
       const groundGeo = new THREE.CircleGeometry(120, 64);
       const ground = new THREE.Mesh(groundGeo, new THREE.MeshStandardMaterial({ color: 0x4a7c4f, roughness: 0.8 }));
       ground.rotation.x = -Math.PI/2; ground.position.y = -0.1; ground.receiveShadow = true; scene.add(ground);
-      for (let i = 0; i < 200; i++) {
-        const angle = Math.random() * Math.PI * 2;
-        const dist = 5 + Math.random() * 80;
-        const grassGeo = new THREE.ConeGeometry(0.1, 0.5, 4);
-        const grass = new THREE.Mesh(grassGeo, new THREE.MeshStandardMaterial({ color: 0x3a6a3a }));
-        grass.position.set(Math.cos(angle)*dist, 0.15, Math.sin(angle)*dist); grass.castShadow = true; scene.add(grass);
-      }
       for (let i = 0; i < 10; i++) {
         const angle = (i / 10) * Math.PI * 2;
         const distance = 45 + Math.random() * 40;
@@ -812,8 +1054,6 @@
         const foliageGeo = new THREE.ConeGeometry(2.5, 6, 8);
         const foliage = new THREE.Mesh(foliageGeo, new THREE.MeshStandardMaterial({ color: 0x2d5a27, roughness: 0.5 }));
         foliage.position.y = 6; foliage.castShadow = true; treeGroup.add(foliage);
-        const foliage2 = new THREE.Mesh(new THREE.ConeGeometry(2, 5, 8), new THREE.MeshStandardMaterial({ color: 0x3a6a3a, roughness: 0.5 }));
-        foliage2.position.y = 8; treeGroup.add(foliage2);
         const x = Math.cos(angle)*distance; const z = Math.sin(angle)*distance;
         treeGroup.position.set(x, 0, z); scene.add(treeGroup);
         obstacles.push({ position: new THREE.Vector3(x, 0, z), radius: 1.5, height: 10 });
@@ -828,9 +1068,6 @@
         const roofGeo = new THREE.ConeGeometry(4, 2.5, 4);
         const roof = new THREE.Mesh(roofGeo, new THREE.MeshStandardMaterial({ color: 0x8b4513, roughness: 0.5 }));
         roof.position.y = 5; roof.castShadow = true; houseGroup.add(roof);
-        const doorGeo = new THREE.BoxGeometry(1, 2.5, 0.2);
-        const door = new THREE.Mesh(doorGeo, new THREE.MeshStandardMaterial({ color: 0x654321, roughness: 0.4 }));
-        door.position.set(0, 1.25, 2.5); houseGroup.add(door);
         const x = Math.cos(angle)*distance; const z = Math.sin(angle)*distance;
         houseGroup.position.set(x, 0, z); houseGroup.rotation.y = Math.random() * Math.PI * 2; scene.add(houseGroup);
         obstacles.push({ position: new THREE.Vector3(x, 0, z), radius: 3.5, height: 7 });
@@ -935,7 +1172,7 @@
     
     document.getElementById('start-btn').addEventListener('click', () => {
       currentState = State.WAITING;
-      bottomPanel.innerHTML = `<div style="text-align:center; color:white; padding:20px;"><div style="font-size:2.5rem; font-weight:900; color:#ffaa00; margin:15px;" id="timer-display">30</div><div style="margin:10px; font-size:14px;">👥 Jugadores listos: 50/50</div><div style="margin:10px; font-size:12px; color:#aaa;">Preparando sala de espera...</div><button class="start-btn" id="cancel-waiting" style="background:gray; margin-top:15px;">CANCELAR</button></div>`;
+      bottomPanel.innerHTML = `<div style="text-align:center; color:white; padding:20px;"><div style="font-size:2.5rem; font-weight:900; color:#ffaa00; margin:15px;" id="timer-display">30</div><div style="margin:10px; font-size:14px;">Jugadores listos: 50/50</div><div style="margin:10px; font-size:12px; color:#aaa;">Preparando sala de espera...</div><button class="start-btn" id="cancel-waiting" style="background:gray; margin-top:15px;">CANCELAR</button></div>`;
       let sec = 30;
       const timerEl = document.getElementById('timer-display');
       const interval = setInterval(() => {
@@ -944,12 +1181,6 @@
       }, 1000);
       document.getElementById('cancel-waiting').onclick = () => { clearInterval(interval); location.reload(); };
     });
-    
-    document.getElementById('menu-tienda').addEventListener('click', () => alert('🛒 TIENDA - Skins exclusivas'));
-    document.getElementById('menu-luck').addEventListener('click', () => alert('🎰 LUCK ROYALE - ¡Gira y gana!'));
-    document.getElementById('menu-pase').addEventListener('click', () => alert('👑 PASE BOOYAH - Recompensas premium'));
-    document.getElementById('menu-misiones').addEventListener('click', () => alert('📋 MISIONES DIARIAS - Completa objetivos'));
-    document.getElementById('menu-eventos').addEventListener('click', () => alert('🎪 EVENTOS - Participa ahora'));
     
     window.addEventListener('resize', () => { 
       camera.aspect = window.innerWidth / window.innerHeight; 
@@ -973,7 +1204,6 @@
         const forward = new THREE.Vector3(0, 0, -1).applyAxisAngle(new THREE.Vector3(0, 1, 0), cameraYaw);
         const right = new THREE.Vector3(1, 0, 0).applyAxisAngle(new THREE.Vector3(0, 1, 0), cameraYaw);
         const dir = forward.clone().multiplyScalar(-moveInput.y).add(right.clone().multiplyScalar(moveInput.x));
-        
         if (!localPlayer.onGround) {
           if (localPlayer.parachuteOpen) {
             localPlayer.velocity.y = -2.5;
@@ -996,24 +1226,19 @@
             const newPos = localPlayer.position.clone();
             newPos.x += dir.x * speed * delta;
             newPos.z += dir.z * speed * delta;
-            if (!checkCollision(newPos)) {
-              localPlayer.position.copy(newPos);
-            }
+            if (!checkCollision(newPos)) localPlayer.position.copy(newPos);
             const targetAngle = Math.atan2(dir.x, dir.z);
             playerModel.rotation.y += (targetAngle - playerModel.rotation.y) * 0.2;
           }
         }
-        
         playerModel.position.copy(localPlayer.position);
         if (parachuteModel) { parachuteModel.position.copy(playerModel.position); parachuteModel.position.y += 3.5; }
-        
         const camOffset = new THREE.Vector3(0, 4.5, -8).applyAxisAngle(new THREE.Vector3(0, 1, 0), cameraYaw);
         const targetCamPos = playerModel.position.clone().add(camOffset);
         targetCamPos.y += cameraPitch * 4;
         camera.position.lerp(targetCamPos, 0.15);
         camera.lookAt(playerModel.position.x, playerModel.position.y + 2, playerModel.position.z);
       }
-      
       if (currentState === State.PLANE && planeGroup) {
         planeGroup.position.x += 1.2; planeGroup.position.z += 1.2;
         if (planeGroup.position.x > 55) planeGroup.position.x = -55;
@@ -1022,7 +1247,6 @@
         camera.position.lerp(targetPos, 0.1);
         camera.lookAt(planeGroup.position);
       }
-      
       if (currentState === State.PLAYING || currentState === State.PLANE) {
         ctxMinimap.clearRect(0, 0, 110, 110);
         ctxMinimap.fillStyle = '#1a3a1a'; ctxMinimap.fillRect(0, 0, 110, 110);
@@ -1031,8 +1255,6 @@
           const px = 55 + (localPlayer.position.x / 120) * 48;
           const py = 55 + (localPlayer.position.z / 120) * 48;
           ctxMinimap.fillStyle = '#FFD700'; ctxMinimap.beginPath(); ctxMinimap.arc(px, py, 4, 0, 2 * Math.PI); ctxMinimap.fill();
-          ctxMinimap.strokeStyle = 'white'; ctxMinimap.lineWidth = 1.5; ctxMinimap.beginPath();
-          ctxMinimap.moveTo(px, py); ctxMinimap.lineTo(px + Math.sin(cameraYaw) * 8, py + Math.cos(cameraYaw) * 8); ctxMinimap.stroke();
         }
       }
     }
