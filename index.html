@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, shrink-to-fit=yes">
+  <title>⚔️ BATTLE ROYALE PRO - FREE FIRE STYLE</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+    }
+    body {
+      background: #000;
+      overflow: hidden;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      touch-action: manipulation;
+      position: fixed;
+      width: 100%;
+      height: 100%;
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+    
+    #mobile-ui {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 100;
+    }
+    
+    #joystick-container {
+      position: absolute;
+      bottom: 50px;
+      left: 40px;
+      width: 140px;
+      height: 140px;
+      pointer-events: auto;
+      display: none;
+    }
+    #joystick-base {
+      width: 140px;
+      height: 140px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 50%;
+      border: 3px solid rgba(255,255,255,0.4);
+      position: relative;
+      backdrop-filter: blur(10px);
+    }
+    #joystick-thumb {
+      width: 60px;
+      height: 60px;
+      background: rgba(255,200,0,0.8);
+      border-radius: 50%;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 20px rgba(255,150,0,0.9);
+    }
+    
+    #jump-btn {
+      position: absolute;
+      bottom: 70px;
+      right: 30px;
+      width: 90px;
+      height: 90px;
+      background: radial-gradient(circle, #ffcc00, #ff6600);
+      border-radius: 50%;
+      border: 4px solid white;
+      color: white;
+      font-weight: 900;
+      font-size: 18px;
+      pointer-events: auto;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 35px rgba(255,100,0,1);
+      animation: pulse 0.8s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+    }
+    
+    #minimap-container {
+      position: absolute;
+      top: 25px;
+      right: 25px;
+      width: 150px;
+      height: 150px;
+      background: rgba(0,0,0,0.75);
+      border-radius: 50%;
+      border: 3px solid #ffaa00;
+      overflow: hidden;
+      display: none;
+      pointer-events: auto;
+      box-shadow: 0 0 25px rgba(0,0,0,0.9);
+    }
+    #minimap-canvas {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+    }
+    
+    .lobby-panel {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(15,15,30,0.92);
+      backdrop-filter: blur(30px);
+      border-radius: 35px 35px 0 0;
+      padding: 25px 20px 35px;
+      color: white;
+      text-align: center;
+      z-index: 200;
+      pointer-events: auto;
+      border-top: 3px solid gold;
+    }
+    .lobby-title {
+      font-size: 2.2rem;
+      font-weight: 900;
+      color: #ffd700;
+      text-shadow: 0 0 25px #ffaa00;
+    }
+    .gold-btn {
+      background: linear-gradient(45deg, #ffd700, #ff8800);
+      border: none;
+      color: black;
+      font-weight: bold;
+      font-size: 1.4rem;
+      padding: 16px;
+      border-radius: 30px;
+      width: 100%;
+      margin: 10px 0;
+      letter-spacing: 2px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="game-canvas"></canvas>
+  
+  <div id="mobile-ui">
+    <div id="joystick-container">
+      <div id="joystick-base"><div id="joystick-thumb"></div></div>
+    </div>
+    <div id="jump-btn">SALTAR</div>
+    <div id="minimap-container">
+      <canvas id="minimap-canvas" width="150" height="150"></canvas>
+    </div>
+    
+    <div id="lobby-panel" class="lobby-panel">
+      <div class="lobby-title">⚡BATTLE ROYALE</div>
+      <div style="margin:10px 0; font-size:1.1rem;">🔥 SKIN LEGENDARIA EQUIPADA 🔥</div>
+      <button class="gold-btn" id="start-btn">▶ INICIAR PARTIDA</button>
+      <div style="color:#aaa; margin-top:5px;">50 jugadores • Paracaídas real</div>
+    </div>
+    
+    <div id="waiting-panel" class="lobby-panel" style="display:none;">
+      <div class="lobby-title">⏳ SALA DE ESPERA</div>
+      <div style="font-size:3rem; font-weight:900; color:#ffaa00;" id="timer-display">30</div>
+      <div>Jugadores: 50/50</div>
+      <button class="gold-btn" id="cancel-btn" style="margin-top:15px;">CANCELAR</button>
+    </div>
+  </div>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.128.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.128.0/examples/jsm/"
+      }
+    }
+  </script>
+
+  <script type="module">
+    import * as THREE from 'three';
+
+    const State = { LOBBY: 'LOBBY', WAITING: 'WAITING', PLANE: 'PLANE', PLAYING: 'PLAYING' };
+    let currentState = State.LOBBY;
+    
+    const canvas = document.getElementById('game-canvas');
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x1a2b3c);
+    scene.fog = new THREE.Fog(0x1a2b3c, 50, 250);
+    
+    const camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.5, 400);
+    camera.position.set(0, 5, 10);
+    
+    const ambient = new THREE.AmbientLight(0x445566);
+    scene.add(ambient);
+    const sun = new THREE.DirectionalLight(0xffeedd, 1.4);
+    sun.position.set(80, 70, 50);
+    sun.castShadow = true;
+    sun.receiveShadow = true;
+    scene.add(sun);
+    
+    let lobbyModel, playerModel, parachuteModel, planeGroup;
+    let localPlayer = {
+      position: new THREE.Vector3(0, 20, 0),
+      velocity: new THREE.Vector3(0, 0, 0),
+      inPlane: true,
+      parachuteOpen: false,
+      onGround: false
+    };
+    
+    let cameraYaw = 0, cameraPitch = 0.2;
+    let moveInput = { x: 0, y: 0 };
+    let joystickActive = false, joystickId = null;
+    
+    const joystickContainer = document.getElementById('joystick-container');
+    const joystickBase = document.getElementById('joystick-base');
+    const joystickThumb = document.getElementById('joystick-thumb');
+    const jumpBtn = document.getElementById('jump-btn');
+    const minimapContainer = document.getElementById('minimap-container');
+    const minimapCanvas = document.getElementById('minimap-canvas');
+    const ctxMinimap = minimapCanvas.getContext('2d');
+    const lobbyPanel = document.getElementById('lobby-panel');
+    const waitingPanel = document.getElementById('waiting-panel');
+    
+    // Personaje mejorado con más detalles
+    function createDetailedCharacter(color = 0xff5500) {
+      const group = new THREE.Group();
+      
+      // Piernas con botas
+      const legGeo = new THREE.CylinderGeometry(0.22, 0.25, 0.9, 8);
+      const legMat = new THREE.MeshStandardMaterial({ color: 0x1a1a2e, roughness: 0.5 });
+      const leftLeg = new THREE.Mesh(legGeo, legMat);
+      leftLeg.position.set(-0.3, 0.45, 0);
+      leftLeg.castShadow = true;
+      group.add(leftLeg);
+      const rightLeg = new THREE.Mesh(legGeo, legMat);
+      rightLeg.position.set(0.3, 0.45, 0);
+      rightLeg.castShadow = true;
+      group.add(rightLeg);
+      
+      // Botas
+      const bootGeo = new THREE.BoxGeometry(0.28, 0.2, 0.35);
+      const bootMat = new THREE.MeshStandardMaterial({ color: 0x111111 });
+      const leftBoot = new THREE.Mesh(bootGeo, bootMat);
+      leftBoot.position.set(-0.3, 0.1, 0.05);
+      group.add(leftBoot);
+      const rightBoot = new THREE.Mesh(bootGeo, bootMat);
+      rightBoot.position.set(0.3, 0.1, 0.05);
+      group.add(rightBoot);
+      
+      // Torso
+      const torsoGeo = new THREE.CylinderGeometry(0.5, 0.45, 1.4, 8);
+      const torsoMat = new THREE.MeshStandardMaterial({ color: 0x223344, roughness: 0.3 });
+      const torso = new THREE.Mesh(torsoGeo, torsoMat);
+      torso.position.y = 1.1;
+      torso.castShadow = true;
+      group.add(torso);
+      
+      // Chaleco táctico
+      const vestGeo = new THREE.CylinderGeometry(0.52, 0.48, 1.1, 8);
+      const vestMat = new THREE.MeshStandardMaterial({ color: color, roughness: 0.25, metalness: 0.3 });
+      const vest = new THREE.Mesh(vestGeo, vestMat);
+      vest.position.y = 1.2;
+      vest.castShadow = true;
+      group.add(vest);
+      
+      // Brazos musculosos
+      const armGeo = new THREE.CylinderGeometry(0.16, 0.19, 0.9, 6);
+      const armMat = new THREE.MeshStandardMaterial({ color: 0x334455 });
+      const leftArm = new THREE.Mesh(armGeo, armMat);
+      leftArm.position.set(-0.65, 1.35, 0);
+      leftArm.rotation.z = 0.25;
+      leftArm.castShadow = true;
+      group.add(leftArm);
+      const rightArm = new THREE.Mesh(armGeo, armMat);
+      rightArm.position.set(0.65, 1.35, 0);
+      rightArm.rotation.z = -0.25;
+      rightArm.castShadow = true;
+      group.add(rightArm);
+      
+      // Cabeza detallada
+      const headGeo = new THREE.SphereGeometry(0.45, 20, 20);
+      const headMat = new THREE.MeshStandardMaterial({ color: 0xffccaa, roughness: 0.2 });
+      const head = new THREE.Mesh(headGeo, headMat);
+      head.position.y = 2.05;
+      head.castShadow = true;
+      group.add(head);
+      
+      // Casco militar
+      const helmetGeo = new THREE.SphereGeometry(0.48, 20, 20);
+      const helmetMat = new THREE.MeshStandardMaterial({ color: 0x2a2a2a, roughness: 0.1, metalness: 0.9 });
+      const helmet = new THREE.Mesh(helmetGeo, helmetMat);
+      helmet.position.y = 2.15;
+      helmet.castShadow = true;
+      group.add(helmet);
+      
+      // Mochila
+      const backpackGeo = new THREE.BoxGeometry(0.5, 0.7, 0.3);
+      const backpackMat = new THREE.MeshStandardMaterial({ color: 0x445544 });
+      const backpack = new THREE.Mesh(backpackGeo, backpackMat);
+      backpack.position.set(0, 1.4, -0.5);
+      backpack.castShadow = true;
+      group.add(backpack);
+      
+      return group;
+    }
+    
+    // Paracaídas
+    function createParachute() {
+      const group = new THREE.Group();
+      const canopyGeo = new THREE.SphereGeometry(2.2, 16, 8, 0, Math.PI*2, 0, Math.PI/2);
+      const canopyMat = new THREE.MeshStandardMaterial({ 
+        color: 0xff4400, 
+        side: THREE.DoubleSide,
+        transparent: true,
+        opacity: 0.9,
+        roughness: 0.4
+      });
+      const canopy = new THREE.Mesh(canopyGeo, canopyMat);
+      canopy.rotation.x = Math.PI;
+      canopy.position.y = 2.5;
+      group.add(canopy);
+      
+      // Cuerdas
+      for (let i = 0; i < 8; i++) {
+        const angle = (i / 8) * Math.PI * 2;
+        const ropeGeo = new THREE.CylinderGeometry(0.03, 0.03, 2.5, 4);
+        const rope = new THREE.Mesh(ropeGeo, new THREE.MeshStandardMaterial({ color: 0xdddddd }));
+        rope.position.set(Math.cos(angle)*1.5, 1.3, Math.sin(angle)*1.5);
+        rope.rotation.z = Math.PI/2;
+        rope.rotation.y = angle;
+        group.add(rope);
+      }
+      return group;
+    }
+    
+    // Mundo con montañas, casas, árboles, carros
+    function createWorld() {
+      const groundGeo = new THREE.CircleGeometry(120, 64);
+      const ground = new THREE.Mesh(groundGeo, new THREE.MeshStandardMaterial({ color: 0x3a5a3a, roughness: 0.9 }));
+      ground.rotation.x = -Math.PI/2;
+      ground.position.y = -0.1;
+      ground.receiveShadow = true;
+      scene.add(ground);
+      
+      // Montañas
+      for (let i = 0; i < 15; i++) {
+        const angle = (i / 15) * Math.PI * 2;
+        const radius = 45 + Math.random() * 45;
+        const height = 6 + Math.random() * 18;
+        const mountain = new THREE.Mesh(
+          new THREE.ConeGeometry(4 + Math.random() * 7, height, 8),
+          new THREE.MeshStandardMaterial({ color: 0x4a6741, roughness: 0.7 })
+        );
+        mountain.position.set(Math.cos(angle)*radius, height/2, Math.sin(angle)*radius);
+        mountain.castShadow = true;
+        mountain.receiveShadow = true;
+        scene.add(mountain);
+      }
+      
+      // Casas
+      for (let i = 0; i < 12; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const dist = 20 + Math.random() * 50;
+        const house = new THREE.Group();
+        const wall = new THREE.Mesh(new THREE.BoxGeometry(2.5, 2.2, 2.5), new THREE.MeshStandardMaterial({ color: 0xccbbaa }));
+        wall.position.y = 1.1;
+        wall.castShadow = true;
+        house.add(wall);
+        const roof = new THREE.Mesh(new THREE.ConeGeometry(1.8, 1.2, 4), new THREE.MeshStandardMaterial({ color: 0x993333 }));
+        roof.position.y = 2.2;
+        roof.castShadow = true;
+        house.add(roof);
+        house.position.set(Math.cos(angle)*dist, 0, Math.sin(angle)*dist);
+        scene.add(house);
+      }
+      
+      // Árboles
+      for (let i = 0; i < 50; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const dist = 10 + Math.random() * 65;
+        const tree = new THREE.Group();
+        tree.add(new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.35, 2.2), new THREE.MeshStandardMaterial({ color: 0x8b5a2b })));
+        tree.add(new THREE.Mesh(new THREE.ConeGeometry(1.1, 2.5, 8), new THREE.MeshStandardMaterial({ color: 0x2d5a27 })));
+        tree.children[0].position.y = 1.1;
+        tree.children[1].position.y = 2.5;
+        tree.position.set(Math.cos(angle)*dist, 0, Math.sin(angle)*dist);
+        scene.add(tree);
+      }
+      
+      // Carros
+      for (let i = 0; i < 8; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const dist = 18 + Math.random() * 40;
+        const car = new THREE.Group();
+        car.add(new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.6, 3.2), new THREE.MeshStandardMaterial({ color: 0x2255cc })));
+        car.add(new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.5, 1.8), new THREE.MeshStandardMaterial({ color: 0x88aacc })));
+        car.children[0].position.y = 0.5;
+        car.children[1].position.set(0, 0.9, -0.3);
+        car.position.set(Math.cos(angle)*dist, 0, Math.sin(angle)*dist);
+        car.rotation.y = Math.random() * Math.PI;
+        scene.add(car);
+      }
+    }
+    
+    function setupLobby() {
+      if (lobbyModel) scene.remove(lobbyModel);
+      lobbyModel = createDetailedCharacter(0xff5500);
+      lobbyModel.position.set(0, 0.2, 0);
+      lobbyModel.rotation.y = 0;
+      scene.add(lobbyModel);
+      camera.position.set(0, 4, 7);
+      camera.lookAt(0, 1.8, 0);
+    }
+    
+    function startPlaneSequence() {
+      waitingPanel.style.display = 'none';
+      currentState = State.PLANE;
+      if (lobbyModel) scene.remove(lobbyModel);
+      
+      planeGroup = new THREE.Group();
+      const fuse = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 0.8, 6, 8), new THREE.MeshStandardMaterial({ color: 0xcccccc }));
+      fuse.rotation.x = Math.PI/2;
+      planeGroup.add(fuse);
+      planeGroup.add(new THREE.Mesh(new THREE.BoxGeometry(5, 0.2, 1.2), new THREE.MeshStandardMaterial({ color: 0xaaaaaa })));
+      planeGroup.position.set(-50, 55, -50);
+      planeGroup.rotation.y = Math.PI/4;
+      scene.add(planeGroup);
+      
+      localPlayer.inPlane = true;
+      localPlayer.parachuteOpen = false;
+      localPlayer.onGround = false;
+      localPlayer.position.copy(planeGroup.position);
+      
+      jumpBtn.style.display = 'flex';
+      minimapContainer.style.display = 'block';
+      joystickContainer.style.display = 'none';
+    }
+    
+    function jumpFromPlane() {
+      if (!localPlayer.inPlane) return;
+      localPlayer.inPlane = false;
+      localPlayer.parachuteOpen = true;
+      localPlayer.position.copy(planeGroup.position);
+      localPlayer.velocity.set(0, -1.5, 0);
+      
+      jumpBtn.style.display = 'none';
+      joystickContainer.style.display = 'block';
+      currentState = State.PLAYING;
+      
+      if (planeGroup) scene.remove(planeGroup);
+      if (playerModel) scene.remove(playerModel);
+      playerModel = createDetailedCharacter(0x00aa88);
+      playerModel.position.copy(localPlayer.position);
+      scene.add(playerModel);
+      
+      // Añadir paracaídas
+      parachuteModel = createParachute();
+      parachuteModel.position.copy(playerModel.position);
+      parachuteModel.position.y += 2.5;
+      scene.add(parachuteModel);
+    }
+    
+    // Joystick handlers
+    joystickBase.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      joystickActive = true;
+      joystickId = e.pointerId;
+    });
+    joystickBase.addEventListener('pointermove', (e) => {
+      if (!joystickActive || e.pointerId !== joystickId) return;
+      e.preventDefault();
+      const rect = joystickBase.getBoundingClientRect();
+      const cx = rect.left + rect.width/2;
+      const cy = rect.top + rect.height/2;
+      let dx = e.clientX - cx;
+      let dy = e.clientY - cy;
+      const dist = Math.min(60, Math.sqrt(dx*dx + dy*dy));
+      const angle = Math.atan2(dy, dx);
+      const tx = Math.cos(angle) * dist;
+      const ty = Math.sin(angle) * dist;
+      joystickThumb.style.transform = `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px))`;
+      moveInput.x = tx / 60;
+      moveInput.y = ty / 60;
+    });
+    joystickBase.addEventListener('pointerup', () => {
+      joystickActive = false;
+      joystickThumb.style.transform = 'translate(-50%, -50%)';
+      moveInput.x = 0;
+      moveInput.y = 0;
+    });
+    
+    jumpBtn.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      jumpFromPlane();
+    });
+    
+    // Control de cámara táctil
+    canvas.addEventListener('touchmove', (e) => {
+      if (currentState === State.PLAYING || currentState === State.PLANE) {
+        e.preventDefault();
+        if (e.touches.length === 1 && !joystickActive) {
+          cameraYaw -= e.touches[0].movementX * 0.004 || 0;
+          cameraPitch -= e.touches[0].movementY * 0.004 || 0;
+          cameraPitch = Math.max(-1.2, Math.min(0.8, cameraPitch));
+        }
+      }
+    }, { passive: false });
+    
+    document.getElementById('start-btn').addEventListener('click', () => {
+      currentState = State.WAITING;
+      lobbyPanel.style.display = 'none';
+      waitingPanel.style.display = 'block';
+      let sec = 30;
+      document.getElementById('timer-display').textContent = sec;
+      const interval = setInterval(() => {
+        sec--;
+        document.getElementById('timer-display').textContent = sec;
+        if (sec <= 0) {
+          clearInterval(interval);
+          startPlaneSequence();
+        }
+      }, 1000);
+      document.getElementById('cancel-btn').onclick = () => {
+        clearInterval(interval);
+        waitingPanel.style.display = 'none';
+        lobbyPanel.style.display = 'block';
+        currentState = State.LOBBY;
+      };
+    });
+    
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+    
+    function updateGame(delta) {
+      if (currentState === State.PLAYING && playerModel) {
+        const speed = 6.0;
+        const forward = new THREE.Vector3(0, 0, -1).applyAxisAngle(new THREE.Vector3(0, 1, 0), cameraYaw);
+        const right = new THREE.Vector3(1, 0, 0).applyAxisAngle(new THREE.Vector3(0, 1, 0), cameraYaw);
+        const dir = forward.clone().multiplyScalar(-moveInput.y).add(right.clone().multiplyScalar(moveInput.x));
+        
+        if (dir.length() > 0) {
+          dir.normalize();
+          localPlayer.position.x += dir.x * speed * delta;
+          localPlayer.position.z += dir.z * speed * delta;
+        }
+        
+        // Física de paracaídas y caída libre
+        if (!localPlayer.onGround) {
+          if (localPlayer.parachuteOpen) {
+            localPlayer.velocity.y = -2.2;
+            // Movimiento horizontal durante paracaídas
+            if (moveInput.x !== 0 || moveInput.y !== 0) {
+              localPlayer.position.x += dir.x * 4 * delta;
+              localPlayer.position.z += dir.z * 4 * delta;
+            }
+            if (localPlayer.position.y <= 1.5) {
+              localPlayer.position.y = 1.5;
+              localPlayer.onGround = true;
+              localPlayer.parachuteOpen = false;
+              if (parachuteModel) {
+                scene.remove(parachuteModel);
+                parachuteModel = null;
+              }
+            }
+          } else {
+            localPlayer.velocity.y -= 9.8 * delta;
+            localPlayer.position.y += localPlayer.velocity.y * delta;
+            if (localPlayer.position.y <= 0.15) {
+              localPlayer.position.y = 0.15;
+              localPlayer.onGround = true;
+            }
+          }
+          localPlayer.position.y += localPlayer.velocity.y * delta;
+        }
+        
+        playerModel.position.copy(localPlayer.position);
+        if (parachuteModel) {
+          parachuteModel.position.copy(playerModel.position);
+          parachuteModel.position.y += 2.8;
+        }
+        
+        // Cámara tercera persona suave
+        const camOffset = new THREE.Vector3(0, 3.5, -6.5).applyAxisAngle(new THREE.Vector3(0, 1, 0), cameraYaw);
+        camera.position.lerp(playerModel.position.clone().add(camOffset), 0.25);
+        camera.lookAt(playerModel.position.x, playerModel.position.y + 1.6, playerModel.position.z);
+      }
+      
+      if (currentState === State.PLANE && planeGroup) {
+        planeGroup.position.x += 0.9;
+        planeGroup.position.z += 0.9;
+        if (planeGroup.position.x > 55) planeGroup.position.x = -55;
+        if (planeGroup.position.z > 55) planeGroup.position.z = -55;
+        camera.position.lerp(planeGroup.position.clone().add(new THREE.Vector3(0, 8, 15)), 0.15);
+        camera.lookAt(planeGroup.position);
+      }
+      
+      // Minimap
+      if (currentState === State.PLAYING || currentState === State.PLANE) {
+        ctxMinimap.clearRect(0, 0, 150, 150);
+        ctxMinimap.fillStyle = '#2d5a27';
+        ctxMinimap.beginPath();
+        ctxMinimap.arc(75, 75, 70, 0, Math.PI*2);
+        ctxMinimap.fill();
+        if (playerModel && currentState === State.PLAYING) {
+          const px = 75 + (localPlayer.position.x / 100) * 60;
+          const py = 75 + (localPlayer.position.z / 100) * 60;
+          ctxMinimap.fillStyle = '#ffaa00';
+          ctxMinimap.beginPath();
+          ctxMinimap.arc(px, py, 6, 0, 2*Math.PI);
+          ctxMinimap.fill();
+        }
+      }
+    }
+    
+    function animate() {
+      requestAnimationFrame(animate);
+      updateGame(0.016);
+      renderer.render(scene, camera);
+    }
+    
+    createWorld();
+    setupLobby();
+    animate();
+  </script>
+</body>
+</html>
