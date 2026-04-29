@@ -210,6 +210,7 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
+      box-shadow: 0 0 10px rgba(255, 200, 0, 0.5);
     }
     #jump-btn {
       position: absolute;
@@ -229,6 +230,7 @@
       justify-content: center;
       z-index: 20;
       animation: pulse 0.8s infinite;
+      box-shadow: 0 0 15px rgba(255, 102, 0, 0.6);
     }
     @keyframes pulse {
       0%, 100% { transform: scale(1); }
@@ -361,6 +363,7 @@
     let cameraYaw = 0, cameraPitch = 0.2;
     let moveInput = { x: 0, y: 0 };
     let joystickActive = false, joystickId = null;
+    let lobbyBobTime = 0;
     
     // UI Elements
     const topBar = document.getElementById('top-bar');
@@ -376,16 +379,21 @@
     
     function createCharacter(color = 0xff5500) {
       const g = new THREE.Group();
+      // Legs
       g.add(new THREE.Mesh(new THREE.CylinderGeometry(0.22,0.25,0.9,8), new THREE.MeshStandardMaterial({color:0x1a1a2e})));
       g.children[0].position.set(-0.3,0.45,0);
       g.add(new THREE.Mesh(new THREE.CylinderGeometry(0.22,0.25,0.9,8), new THREE.MeshStandardMaterial({color:0x1a1a2e})));
       g.children[1].position.set(0.3,0.45,0);
+      // Torso
       const torso = new THREE.Mesh(new THREE.CylinderGeometry(0.5,0.45,1.4,8), new THREE.MeshStandardMaterial({color:0x223344}));
       torso.position.y=1.1; g.add(torso);
+      // Vest
       const vest = new THREE.Mesh(new THREE.CylinderGeometry(0.52,0.48,1.1,8), new THREE.MeshStandardMaterial({color}));
       vest.position.y=1.2; g.add(vest);
+      // Head
       g.add(new THREE.Mesh(new THREE.SphereGeometry(0.45,16,16), new THREE.MeshStandardMaterial({color:0xffccaa})));
       g.children[g.children.length-1].position.y=2.05;
+      // Helmet
       const helmet = new THREE.Mesh(new THREE.SphereGeometry(0.48,16,16), new THREE.MeshStandardMaterial({color:0x333333, metalness:0.8}));
       helmet.position.y=2.15; g.add(helmet);
       return g;
@@ -408,11 +416,14 @@
     function createWorld() {
       const ground = new THREE.Mesh(new THREE.CircleGeometry(120,64), new THREE.MeshStandardMaterial({color:0x3a5a3a}));
       ground.rotation.x=-Math.PI/2; ground.position.y=-0.1; ground.receiveShadow=true; scene.add(ground);
+      
+      // Trees
       for(let i=0;i<12;i++){
         const a=Math.random()*Math.PI*2, d=25+Math.random()*50;
         const m=new THREE.Mesh(new THREE.ConeGeometry(4+Math.random()*6,8+Math.random()*14,8), new THREE.MeshStandardMaterial({color:0x4a6741}));
         m.position.set(Math.cos(a)*d,4,Math.sin(a)*d); m.castShadow=true; scene.add(m);
       }
+      // Houses
       for(let i=0;i<10;i++){
         const a=Math.random()*Math.PI*2, d=18+Math.random()*45;
         const h=new THREE.Group();
@@ -458,7 +469,7 @@
       if(!localPlayer.inPlane) return;
       localPlayer.inPlane=false; localPlayer.parachuteOpen=true;
       localPlayer.position.copy(planeGroup.position);
-      localPlayer.velocity.set(0,-1.5,0);
+      localPlayer.velocity.set(0,0,0); // Reset velocity
       
       jumpBtn.style.display='none';
       joystickContainer.style.display='block';
@@ -532,45 +543,102 @@
     });
     
     function updateGame(delta){
-      if(currentState===State.PLAYING&&playerModel){
+      if(currentState===State.PLAYING && playerModel){
         const speed=6;
         const forward=new THREE.Vector3(0,0,-1).applyAxisAngle(new THREE.Vector3(0,1,0),cameraYaw);
         const right=new THREE.Vector3(1,0,0).applyAxisAngle(new THREE.Vector3(0,1,0),cameraYaw);
         const dir=forward.clone().multiplyScalar(-moveInput.y).add(right.clone().multiplyScalar(moveInput.x));
-        if(dir.length()>0){dir.normalize(); localPlayer.position.x+=dir.x*speed*delta; localPlayer.position.z+=dir.z*speed*delta;}
         
         if(!localPlayer.onGround){
           if(localPlayer.parachuteOpen){
-            localPlayer.velocity.y=-2.2;
-            if(moveInput.x!==0||moveInput.y!==0){localPlayer.position.x+=dir.x*4*delta; localPlayer.position.z+=dir.z*4*delta;}
-            if(localPlayer.position.y<=1.5){localPlayer.position.y=1.5; localPlayer.onGround=true; localPlayer.parachuteOpen=false; if(parachuteModel){scene.remove(parachuteModel); parachuteModel=null;}}
-          }else{
-            localPlayer.velocity.y-=9.8*delta;
-            localPlayer.position.y+=localPlayer.velocity.y*delta;
-            if(localPlayer.position.y<=0.15){localPlayer.position.y=0.15; localPlayer.onGround=true;}
+            // Parachute physics
+            localPlayer.velocity.y = -2.2; // Constant fall speed
+            if(moveInput.x!==0||moveInput.y!==0){
+                localPlayer.position.x+=dir.x*4*delta; 
+                localPlayer.position.z+=dir.z*4*delta;
+            }
+            // Landing check
+            if(localPlayer.position.y<=1.5){
+                localPlayer.position.y=1.5; 
+                localPlayer.onGround=true; 
+                localPlayer.parachuteOpen=false; 
+                localPlayer.velocity.set(0,0,0);
+                if(parachuteModel){scene.remove(parachuteModel); parachuteModel=null;}
+            }
+          } else {
+            // Freefall physics
+            localPlayer.velocity.y -= 9.8 * delta;
+            localPlayer.position.y += localPlayer.velocity.y * delta;
+            
+            // Ground check
+            if(localPlayer.position.y <= 1.5){
+                localPlayer.position.y = 1.5; 
+                localPlayer.onGround = true; 
+                localPlayer.velocity.set(0,0,0);
+            }
           }
-          localPlayer.position.y+=localPlayer.velocity.y*delta;
+        } else {
+            // Ground movement
+            if(dir.length() > 0){
+                dir.normalize(); 
+                localPlayer.position.x += dir.x * speed * delta; 
+                localPlayer.position.z += dir.z * speed * delta;
+                
+                // Rotate model to face movement
+                const targetRotation = Math.atan2(dir.x, dir.z);
+                playerModel.rotation.y = targetRotation + Math.PI; // Adjust for model facing
+            }
         }
+
+        // Apply calculated position
+        if(!localPlayer.onGround) {
+             localPlayer.position.y += localPlayer.velocity.y * delta;
+        }
+        
         playerModel.position.copy(localPlayer.position);
-        if(parachuteModel){parachuteModel.position.copy(playerModel.position); parachuteModel.position.y+=2.8;}
+        if(parachuteModel){
+            parachuteModel.position.copy(playerModel.position); 
+            parachuteModel.position.y += 2.8;
+        }
         
         const camOff=new THREE.Vector3(0,3.5,-6.5).applyAxisAngle(new THREE.Vector3(0,1,0),cameraYaw);
         camera.position.lerp(playerModel.position.clone().add(camOff),0.25);
         camera.lookAt(playerModel.position.x,playerModel.position.y+1.6,playerModel.position.z);
       }
-      if(currentState===State.PLANE&&planeGroup){
-        planeGroup.position.x+=0.9; planeGroup.position.z+=0.9;
+      
+      if(currentState===State.PLANE && planeGroup){
+        planeGroup.position.x+=0.9; 
+        planeGroup.position.z+=0.9;
         if(planeGroup.position.x>55) planeGroup.position.x=-55;
         if(planeGroup.position.z>55) planeGroup.position.z=-55;
-        camera.position.lerp(planeGroup.position.clone().add(new THREE.Vector3(0,8,15)),0.15);
+        
+        // Smooth camera transition to plane
+        const targetPos = planeGroup.position.clone().add(new THREE.Vector3(0,8,15));
+        camera.position.lerp(targetPos, 0.1);
         camera.lookAt(planeGroup.position);
       }
+      
+      if(currentState===State.LOBBY && lobbyModel){
+          lobbyBobTime += delta;
+          lobbyModel.position.y = 0.2 + Math.sin(lobbyBobTime * 2) * 0.05;
+          lobbyModel.rotation.y += delta * 0.5;
+      }
+      
       if(currentState===State.PLAYING||currentState===State.PLANE){
         ctxMinimap.clearRect(0,0,150,150);
         ctxMinimap.fillStyle='#2d5a27'; ctxMinimap.beginPath(); ctxMinimap.arc(75,75,70,0,Math.PI*2); ctxMinimap.fill();
-        if(playerModel&&currentState===State.PLAYING){
+        
+        // Draw player on minimap
+        if(playerModel && currentState===State.PLAYING){
           const px=75+(localPlayer.position.x/100)*60, py=75+(localPlayer.position.z/100)*60;
           ctxMinimap.fillStyle='#ffaa00'; ctxMinimap.beginPath(); ctxMinimap.arc(px,py,6,0,2*Math.PI); ctxMinimap.fill();
+          
+          // Draw direction indicator
+          ctxMinimap.strokeStyle='white';
+          ctxMinimap.beginPath();
+          ctxMinimap.moveTo(px, py);
+          ctxMinimap.lineTo(px + Math.sin(cameraYaw)*10, py + Math.cos(cameraYaw)*10);
+          ctxMinimap.stroke();
         }
       }
     }
