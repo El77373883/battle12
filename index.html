@@ -32,7 +32,6 @@
       left: 0;
       z-index: 1;
     }
-    
     #game-ui {
       position: fixed;
       top: 0;
@@ -43,7 +42,6 @@
       z-index: 10;
       pointer-events: none;
     }
-    
     .top-bar {
       position: absolute;
       top: max(20px, env(safe-area-inset-top));
@@ -115,7 +113,6 @@
       font-size: 11px;
       white-space: nowrap;
     }
-    
     .chat-bar {
       position: absolute;
       bottom: 200px;
@@ -130,7 +127,6 @@
       pointer-events: auto;
       border: 1px solid rgba(255,255,255,0.2);
     }
-    
     .bottom-panel {
       position: absolute;
       bottom: 0;
@@ -195,7 +191,6 @@
       transform: scale(0.96);
       box-shadow: 0 4px 15px rgba(255,0,0,0.7);
     }
-    
     #joystick-container {
       position: absolute;
       bottom: 40px;
@@ -226,7 +221,6 @@
       transform: translate(-50%, -50%);
       box-shadow: 0 4px 20px rgba(0,0,0,0.6);
     }
-    
     #jump-btn {
       position: absolute;
       bottom: 50px;
@@ -251,7 +245,6 @@
       0%, 100% { transform: scale(1); }
       50% { transform: scale(1.1); }
     }
-    
     #minimap-container {
       position: absolute;
       top: max(80px, env(safe-area-inset-top));
@@ -270,7 +263,6 @@
       width: 100%;
       height: 100%;
     }
-    
     #plane-hud {
       position: absolute;
       top: 50%;
@@ -283,7 +275,6 @@
       z-index: 25;
       text-shadow: 0 0 15px black;
     }
-
     #music-toggle {
       position: absolute;
       bottom: 180px;
@@ -308,8 +299,6 @@
       transform: scale(0.9);
       background: rgba(255,255,255,0.2);
     }
-
-    /* Perfil AAA */
     #profile-overlay {
       position: fixed;
       top: 0;
@@ -334,8 +323,6 @@
       height: 100%;
       gap: 0;
     }
-    
-    /* Columna izquierda */
     .profile-sidebar {
       width: 260px;
       background: rgba(15,15,25,0.95);
@@ -384,8 +371,6 @@
       opacity: 1;
       filter: drop-shadow(0 0 10px rgba(255,136,0,0.8));
     }
-    
-    /* Columna central */
     .profile-center {
       flex: 1;
       display: flex;
@@ -403,8 +388,6 @@
       width: 100%;
       height: 100%;
     }
-    
-    /* Columna derecha */
     .profile-right {
       width: 340px;
       background: rgba(15,15,25,0.95);
@@ -569,7 +552,6 @@
     .medal:hover .medal-tooltip {
       opacity: 1;
     }
-
     @media (max-width: 768px) {
       .profile-container {
         flex-direction: column;
@@ -604,7 +586,6 @@
 </head>
 <body>
   <canvas id="game-canvas"></canvas>
-
   <audio id="bg-music" loop preload="auto">
     <source src="https://archive.org/download/electronic-guitar/Electronic%20Guitar.mp3" type="audio/mpeg">
   </audio>
@@ -623,12 +604,10 @@
         <div class="currency-item" style="color:#ffd700;">G 168</div>
       </div>
     </div>
-    
     <div class="chat-bar" id="chat-bar">
       <span style="color:#ffcc00; font-weight:bold;">[Mundo]</span> 
       <span>Invitacion de grupo - Mapa aleatorio</span>
     </div>
-    
     <div class="bottom-panel" id="bottom-panel">
       <div class="menu-row">
         <div class="menu-item" id="menu-tienda"><div class="menu-icon">T</div><span>TIENDA</span></div>
@@ -639,23 +618,19 @@
       </div>
       <button class="start-btn" id="start-btn">INICIAR PARTIDA</button>
     </div>
-    
     <div id="plane-hud">
       <div style="font-size: 20px; animation: pulse 0.8s infinite;">PRESIONA SALTAR</div>
       <div style="font-size: 12px; color: #ffcc00;">Elige tu zona de aterrizaje</div>
     </div>
-    
     <div id="joystick-container"><div id="joystick-base"><div id="joystick-thumb"></div></div></div>
     <div id="jump-btn">SALTAR</div>
     <div id="minimap-container"><canvas id="minimap-canvas" width="110" height="110"></canvas></div>
     <div id="music-toggle">M</div>
   </div>
 
-  <!-- PERFIL AAA -->
   <div id="profile-overlay">
     <button class="close-profile-btn" id="close-profile-btn">X</button>
     <div class="profile-container">
-      <!-- Columna izquierda -->
       <div class="profile-sidebar">
         <div class="sidebar-menu-item active" data-section="resumen">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
@@ -690,13 +665,9 @@
           Lista de Deseos
         </div>
       </div>
-      
-      <!-- Columna central -->
       <div class="profile-center">
         <div class="character-stage" id="profile-canvas-container"></div>
       </div>
-      
-      <!-- Columna derecha -->
       <div class="profile-right">
         <div class="profile-header">
           <div class="profile-avatar"></div>
@@ -706,14 +677,12 @@
             <div class="lang">Espanol</div>
           </div>
         </div>
-        
         <div class="stats-grid">
           <div class="stat-card"><div class="stat-value">2,694</div><div class="stat-label">Partidas</div></div>
           <div class="stat-card"><div class="stat-value">550</div><div class="stat-label">Kills</div></div>
           <div class="stat-card"><div class="stat-value">68%</div><div class="stat-label">Win Rate</div></div>
           <div class="stat-card"><div class="stat-value">4.2</div><div class="stat-label">K/D</div></div>
         </div>
-        
         <div class="medals-section">
           <h4>Medallas de Pase</h4>
           <div class="medals-grid">
@@ -763,14 +732,11 @@
     const sunLight = new THREE.DirectionalLight(0xfff5e6, 1.4);
     sunLight.position.set(60, 50, 40);
     sunLight.castShadow = true;
-    sunLight.receiveShadow = true;
-    sunLight.shadow.mapSize.width = 2048;
-    sunLight.shadow.mapSize.height = 2048;
-    sunLight.shadow.camera.near = 1;
-    sunLight.shadow.camera.far = 250;
+    sunLight.shadow.mapSize.width = 1024;
+    sunLight.shadow.mapSize.height = 1024;
     scene.add(sunLight);
     
-    let lobbyModel, playerModel, parachuteModel, planeGroup;
+    let lobbyModel, playerModel, parachuteModel, planeGroup, weaponModel;
     let localPlayer = {
       position: new THREE.Vector3(0, 50, 0),
       velocity: new THREE.Vector3(0, 0, 0),
@@ -808,79 +774,125 @@
       const container = document.getElementById('profile-canvas-container');
       profileScene = new THREE.Scene();
       profileScene.background = new THREE.Color(0x0a0a14);
-      
       profileCamera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.5, 100);
       profileCamera.position.set(0, 2.5, 5);
-      
       profileRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
       profileRenderer.setSize(container.clientWidth, container.clientHeight);
       profileRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       profileRenderer.shadowMap.enabled = true;
       container.appendChild(profileRenderer.domElement);
-      
-      const light1 = new THREE.DirectionalLight(0xffd700, 1.2);
-      light1.position.set(3, 5, 3);
-      profileScene.add(light1);
-      const light2 = new THREE.DirectionalLight(0xff6600, 0.8);
-      light2.position.set(-3, 2, -2);
-      profileScene.add(light2);
-      
-      profileModel = createProfileCharacter();
+      profileScene.add(new THREE.DirectionalLight(0xffd700, 1.2)).position.set(3, 5, 3);
+      profileScene.add(new THREE.DirectionalLight(0xff6600, 0.8)).position.set(-3, 2, -2);
+      profileModel = createDetailedFaceCharacter();
       profileModel.position.set(0, 0, 0);
       profileScene.add(profileModel);
-      
-      const platform = new THREE.Mesh(
-        new THREE.CylinderGeometry(1.2, 1.4, 0.3, 32),
-        new THREE.MeshStandardMaterial({ color: 0x222233, roughness: 0.3, metalness: 0.8 })
-      );
+      const platform = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.4, 0.3, 32), new THREE.MeshStandardMaterial({ color: 0x222233, roughness: 0.3, metalness: 0.8 }));
       platform.position.y = -1;
-      platform.receiveShadow = true;
       profileScene.add(platform);
-      
-      const glowRing = new THREE.Mesh(
-        new THREE.TorusGeometry(1.3, 0.05, 16, 32),
-        new THREE.MeshStandardMaterial({ color: 0xff8800, emissive: new THREE.Color(0xff4400), roughness: 0.1 })
-      );
+      const glowRing = new THREE.Mesh(new THREE.TorusGeometry(1.3, 0.05, 16, 32), new THREE.MeshStandardMaterial({ color: 0xff8800, emissive: new THREE.Color(0xff4400), roughness: 0.1 }));
       glowRing.position.y = -0.85;
       glowRing.rotation.x = Math.PI/2;
       profileScene.add(glowRing);
-      
       animateProfile();
     }
     
-    function createProfileCharacter() {
+    function createDetailedFaceCharacter() {
       const group = new THREE.Group();
-      const bodyGeo = new THREE.CylinderGeometry(0.4, 0.5, 1.6, 8);
+      
+      // Cuerpo
+      const bodyGeo = new THREE.CylinderGeometry(0.4, 0.5, 1.6, 12);
       const body = new THREE.Mesh(bodyGeo, new THREE.MeshStandardMaterial({ color: 0xff6600, roughness: 0.2, metalness: 0.3 }));
       body.position.y = 0.9;
       group.add(body);
-      const headGeo = new THREE.SphereGeometry(0.42, 24, 24);
-      const head = new THREE.Mesh(headGeo, new THREE.MeshStandardMaterial({ color: 0xffccaa, roughness: 0.2 }));
-      head.position.y = 1.9;
+      
+      // Cabeza detallada
+      const headGeo = new THREE.SphereGeometry(0.42, 32, 32);
+      const headMat = new THREE.MeshStandardMaterial({ color: 0xffccaa, roughness: 0.2 });
+      const head = new THREE.Mesh(headGeo, headMat);
+      head.position.y = 1.95;
+      head.scale.set(1, 0.95, 1);
       group.add(head);
+      
+      // Ojos con iris y pupila
+      const eyeWhiteGeo = new THREE.SphereGeometry(0.09, 12, 12);
+      const eyeWhiteMat = new THREE.MeshStandardMaterial({ color: 0xffffff });
+      const leftEye = new THREE.Mesh(eyeWhiteGeo, eyeWhiteMat);
+      leftEye.position.set(-0.15, 2.05, 0.38);
+      group.add(leftEye);
+      const rightEye = new THREE.Mesh(eyeWhiteGeo, eyeWhiteMat);
+      rightEye.position.set(0.15, 2.05, 0.38);
+      group.add(rightEye);
+      
+      // Iris
+      const irisGeo = new THREE.SphereGeometry(0.06, 8, 8);
+      const irisMat = new THREE.MeshStandardMaterial({ color: 0x4422aa });
+      const leftIris = new THREE.Mesh(irisGeo, irisMat);
+      leftIris.position.set(-0.15, 2.05, 0.44);
+      group.add(leftIris);
+      const rightIris = new THREE.Mesh(irisGeo, irisMat);
+      rightIris.position.set(0.15, 2.05, 0.44);
+      group.add(rightIris);
+      
+      // Pupilas
+      const pupilGeo = new THREE.SphereGeometry(0.04, 8, 8);
+      const pupilMat = new THREE.MeshStandardMaterial({ color: 0x000000 });
+      const leftPupil = new THREE.Mesh(pupilGeo, pupilMat);
+      leftPupil.position.set(-0.15, 2.05, 0.47);
+      group.add(leftPupil);
+      const rightPupil = new THREE.Mesh(pupilGeo, pupilMat);
+      rightPupil.position.set(0.15, 2.05, 0.47);
+      group.add(rightPupil);
+      
+      // Cejas
+      const eyebrowGeo = new THREE.BoxGeometry(0.12, 0.03, 0.04);
+      const eyebrowMat = new THREE.MeshStandardMaterial({ color: 0x1a1a1a });
+      const leftBrow = new THREE.Mesh(eyebrowGeo, eyebrowMat);
+      leftBrow.position.set(-0.15, 2.15, 0.38);
+      group.add(leftBrow);
+      const rightBrow = new THREE.Mesh(eyebrowGeo, eyebrowMat);
+      rightBrow.position.set(0.15, 2.15, 0.38);
+      group.add(rightBrow);
+      
+      // Nariz
+      const noseGeo = new THREE.ConeGeometry(0.05, 0.1, 8);
+      const noseMat = new THREE.MeshStandardMaterial({ color: 0xffbb99 });
+      const nose = new THREE.Mesh(noseGeo, noseMat);
+      nose.position.set(0, 1.98, 0.4);
+      nose.rotation.x = Math.PI/2;
+      group.add(nose);
+      
+      // Boca
+      const mouthGeo = new THREE.BoxGeometry(0.12, 0.02, 0.03);
+      const mouthMat = new THREE.MeshStandardMaterial({ color: 0xcc4444 });
+      const mouth = new THREE.Mesh(mouthGeo, mouthMat);
+      mouth.position.set(0, 1.88, 0.4);
+      group.add(mouth);
+      
+      // Pelo
+      const hairGeo = new THREE.SphereGeometry(0.44, 18, 10, 0, Math.PI*2, 0, Math.PI/2);
+      const hairMat = new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.6 });
+      const hair = new THREE.Mesh(hairGeo, hairMat);
+      hair.position.y = 2.3;
+      group.add(hair);
+      
+      // Casco
+      const helmetGeo = new THREE.SphereGeometry(0.44, 16, 8, 0, Math.PI*2, 0, Math.PI/2.5);
+      const helmetMat = new THREE.MeshStandardMaterial({ color: 0x333333, roughness: 0.1, metalness: 0.9 });
+      const helmet = new THREE.Mesh(helmetGeo, helmetMat);
+      helmet.position.y = 2.35;
+      group.add(helmet);
+      
       return group;
     }
     
     function animateProfile() {
       requestAnimationFrame(animateProfile);
-      if (profileModel) {
-        profileModel.rotation.y += 0.005;
-      }
-      if (profileRenderer && profileScene && profileCamera) {
-        profileRenderer.render(profileScene, profileCamera);
-      }
+      if (profileModel) profileModel.rotation.y += 0.005;
+      if (profileRenderer && profileScene && profileCamera) profileRenderer.render(profileScene, profileCamera);
     }
     
-    profileTrigger.addEventListener('click', () => {
-      profileOverlay.classList.add('active');
-      if (!profileScene) initProfileScene();
-    });
-    
-    closeProfileBtn.addEventListener('click', () => {
-      profileOverlay.classList.remove('active');
-    });
-    
-    // Sidebar navigation
+    profileTrigger.addEventListener('click', () => { profileOverlay.classList.add('active'); if (!profileScene) initProfileScene(); });
+    closeProfileBtn.addEventListener('click', () => { profileOverlay.classList.remove('active'); });
     document.querySelectorAll('.sidebar-menu-item').forEach(item => {
       item.addEventListener('click', () => {
         document.querySelectorAll('.sidebar-menu-item').forEach(i => i.classList.remove('active'));
@@ -898,71 +910,107 @@
     musicToggle.addEventListener('click', toggleMusic);
     bgMusic.play().then(() => { isMusicPlaying = true; musicToggle.textContent = 'S'; }).catch(() => {});
     
-    function createProCharacter(skinColor = 0xff6600) {
+    // Crear arma para el lobby
+    function createWeapon() {
+      const weaponGroup = new THREE.Group();
+      // Cañón
+      const barrelGeo = new THREE.CylinderGeometry(0.04, 0.05, 0.9, 8);
+      const barrel = new THREE.Mesh(barrelGeo, new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.1, metalness: 0.9 }));
+      barrel.rotation.x = Math.PI/2;
+      barrel.position.z = 0.45;
+      weaponGroup.add(barrel);
+      // Cuerpo
+      const bodyGeo = new THREE.BoxGeometry(0.12, 0.15, 0.5);
+      const body = new THREE.Mesh(bodyGeo, new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.1, metalness: 0.8 }));
+      body.position.z = 0.1;
+      weaponGroup.add(body);
+      // Culata
+      const stockGeo = new THREE.BoxGeometry(0.08, 0.1, 0.3);
+      const stock = new THREE.Mesh(stockGeo, new THREE.MeshStandardMaterial({ color: 0x8B4513, roughness: 0.4 }));
+      stock.position.z = -0.25;
+      weaponGroup.add(stock);
+      // Empuñadura
+      const gripGeo = new THREE.BoxGeometry(0.06, 0.2, 0.08);
+      const grip = new THREE.Mesh(gripGeo, new THREE.MeshStandardMaterial({ color: 0x333333, roughness: 0.3 }));
+      grip.position.set(0, -0.15, 0.05);
+      weaponGroup.add(grip);
+      // Mira
+      const sightGeo = new THREE.CylinderGeometry(0.02, 0.03, 0.08, 6);
+      const sight = new THREE.Mesh(sightGeo, new THREE.MeshStandardMaterial({ color: 0xff0000, roughness: 0.2, emissive: new THREE.Color(0x330000) }));
+      sight.position.set(0, 0.1, 0.25);
+      weaponGroup.add(sight);
+      return weaponGroup;
+    }
+    
+    function createCharacterWithFace(skinColor = 0xff6600) {
       const group = new THREE.Group();
-      const bootGeo = new THREE.BoxGeometry(0.28, 0.18, 0.38);
-      const bootMat = new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.2 });
-      group.add(new THREE.Mesh(bootGeo, bootMat)).position.set(-0.3, 0.1, 0.06);
-      group.add(new THREE.Mesh(bootGeo, bootMat)).position.set(0.3, 0.1, 0.06);
+      // Piernas
       const legGeo = new THREE.CylinderGeometry(0.22, 0.25, 0.85, 8);
       const legMat = new THREE.MeshStandardMaterial({ color: 0x2a2a3e, roughness: 0.4 });
       const leftLeg = new THREE.Mesh(legGeo, legMat); leftLeg.position.set(-0.3, 0.55, 0); group.add(leftLeg);
       const rightLeg = new THREE.Mesh(legGeo, legMat); rightLeg.position.set(0.3, 0.55, 0); group.add(rightLeg);
-      const kneeGeo = new THREE.SphereGeometry(0.15, 8, 8);
-      const kneeMat = new THREE.MeshStandardMaterial({ color: 0x444444, roughness: 0.2, metalness: 0.8 });
-      group.add(new THREE.Mesh(kneeGeo, kneeMat)).position.set(-0.3, 0.5, 0.15);
-      group.add(new THREE.Mesh(kneeGeo, kneeMat)).position.set(0.3, 0.5, 0.15);
-      const torsoGeo = new THREE.CylinderGeometry(0.48, 0.5, 1.4, 8);
-      const torsoMat = new THREE.MeshStandardMaterial({ color: 0x334455, roughness: 0.3 });
-      const torso = new THREE.Mesh(torsoGeo, torsoMat); torso.position.y = 1.2; group.add(torso);
-      const vestGeo = new THREE.CylinderGeometry(0.5, 0.52, 1.1, 8);
-      const vestMat = new THREE.MeshStandardMaterial({ color: skinColor, roughness: 0.25, metalness: 0.2 });
-      const vest = new THREE.Mesh(vestGeo, vestMat); vest.position.y = 1.3; group.add(vest);
-      const beltGeo = new THREE.TorusGeometry(0.42, 0.06, 8, 16);
-      const beltMat = new THREE.MeshStandardMaterial({ color: 0x8B4513, roughness: 0.3 });
-      const belt = new THREE.Mesh(beltGeo, beltMat); belt.position.y = 0.95; belt.rotation.x = Math.PI/2; group.add(belt);
-      const buckleGeo = new THREE.BoxGeometry(0.15, 0.1, 0.1);
-      const buckleMat = new THREE.MeshStandardMaterial({ color: 0xffd700, roughness: 0.1, metalness: 0.9 });
-      const buckle = new THREE.Mesh(buckleGeo, buckleMat); buckle.position.set(0, 0.95, 0.42); group.add(buckle);
+      // Botas
+      const bootGeo = new THREE.BoxGeometry(0.28, 0.18, 0.38);
+      const bootMat = new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.2 });
+      group.add(new THREE.Mesh(bootGeo, bootMat)).position.set(-0.3, 0.1, 0.06);
+      group.add(new THREE.Mesh(bootGeo, bootMat)).position.set(0.3, 0.1, 0.06);
+      // Torso
+      const torsoGeo = new THREE.CylinderGeometry(0.48, 0.5, 1.4, 12);
+      const torso = new THREE.Mesh(torsoGeo, new THREE.MeshStandardMaterial({ color: 0x334455, roughness: 0.3 }));
+      torso.position.y = 1.2; group.add(torso);
+      // Chaleco
+      const vestGeo = new THREE.CylinderGeometry(0.5, 0.52, 1.1, 12);
+      const vest = new THREE.Mesh(vestGeo, new THREE.MeshStandardMaterial({ color: skinColor, roughness: 0.25, metalness: 0.2 }));
+      vest.position.y = 1.3; group.add(vest);
+      // Brazos
       const upperArmGeo = new THREE.CylinderGeometry(0.16, 0.18, 0.5, 6);
       const upperArmMat = new THREE.MeshStandardMaterial({ color: 0x334455, roughness: 0.4 });
-      const leftUpperArm = new THREE.Mesh(upperArmGeo, upperArmMat); leftUpperArm.position.set(-0.65, 1.2, 0); leftUpperArm.rotation.z = 0.3; group.add(leftUpperArm);
-      const rightUpperArm = new THREE.Mesh(upperArmGeo, upperArmMat); rightUpperArm.position.set(0.65, 1.2, 0); rightUpperArm.rotation.z = -0.3; group.add(rightUpperArm);
+      const lUA = new THREE.Mesh(upperArmGeo, upperArmMat); lUA.position.set(-0.65, 1.2, 0); lUA.rotation.z = 0.3; group.add(lUA);
+      const rUA = new THREE.Mesh(upperArmGeo, upperArmMat); rUA.position.set(0.65, 1.2, 0); rUA.rotation.z = -0.3; group.add(rUA);
       const forearmGeo = new THREE.CylinderGeometry(0.14, 0.16, 0.45, 6);
       const forearmMat = new THREE.MeshStandardMaterial({ color: 0xffccaa, roughness: 0.3 });
-      const leftForearm = new THREE.Mesh(forearmGeo, forearmMat); leftForearm.position.set(-0.75, 0.85, 0); leftForearm.rotation.z = 0.2; group.add(leftForearm);
-      const rightForearm = new THREE.Mesh(forearmGeo, forearmMat); rightForearm.position.set(0.75, 0.85, 0); rightForearm.rotation.z = -0.2; group.add(rightForearm);
-      const handGeo = new THREE.SphereGeometry(0.13, 8, 8);
-      const handMat = new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.3 });
-      group.add(new THREE.Mesh(handGeo, handMat)).position.set(-0.8, 0.65, 0);
-      group.add(new THREE.Mesh(handGeo, handMat)).position.set(0.8, 0.65, 0);
-      const neckGeo = new THREE.CylinderGeometry(0.13, 0.16, 0.22, 8);
-      const neckMat = new THREE.MeshStandardMaterial({ color: 0xffccaa, roughness: 0.3 });
-      const neck = new THREE.Mesh(neckGeo, neckMat); neck.position.y = 1.9; group.add(neck);
-      const headGeo = new THREE.SphereGeometry(0.42, 24, 24);
-      const headMat = new THREE.MeshStandardMaterial({ color: 0xffccaa, roughness: 0.2 });
-      const head = new THREE.Mesh(headGeo, headMat); head.position.y = 2.15; group.add(head);
-      const eyeGeo = new THREE.SphereGeometry(0.08, 8, 8);
-      const eyeMat = new THREE.MeshStandardMaterial({ color: 0xffffff });
-      group.add(new THREE.Mesh(eyeGeo, eyeMat)).position.set(-0.15, 2.25, 0.38);
-      group.add(new THREE.Mesh(eyeGeo, eyeMat)).position.set(0.15, 2.25, 0.38);
-      const pupilGeo = new THREE.SphereGeometry(0.04, 8, 8);
-      const pupilMat = new THREE.MeshStandardMaterial({ color: 0x000000 });
-      group.add(new THREE.Mesh(pupilGeo, pupilMat)).position.set(-0.15, 2.25, 0.42);
-      group.add(new THREE.Mesh(pupilGeo, pupilMat)).position.set(0.15, 2.25, 0.42);
-      const hairGeo = new THREE.SphereGeometry(0.44, 16, 8, 0, Math.PI*2, 0, Math.PI/2);
-      const hairMat = new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.6 });
-      const hair = new THREE.Mesh(hairGeo, hairMat); hair.position.y = 2.35; group.add(hair);
-      const helmetGeo = new THREE.SphereGeometry(0.44, 16, 8, 0, Math.PI*2, 0, Math.PI/2.5);
-      const helmetMat = new THREE.MeshStandardMaterial({ color: 0x333333, roughness: 0.1, metalness: 0.9 });
-      const helmet = new THREE.Mesh(helmetGeo, helmetMat); helmet.position.y = 2.4; group.add(helmet);
-      const earphoneGeo = new THREE.CylinderGeometry(0.08, 0.08, 0.15, 8);
-      const earphoneMat = new THREE.MeshStandardMaterial({ color: 0xff0000, roughness: 0.2, emissive: new THREE.Color(0x330000) });
-      group.add(new THREE.Mesh(earphoneGeo, earphoneMat)).position.set(-0.44, 2.15, 0);
-      group.add(new THREE.Mesh(earphoneGeo, earphoneMat)).position.set(0.44, 2.15, 0);
-      const backpackGeo = new THREE.BoxGeometry(0.45, 0.65, 0.25);
-      const backpackMat = new THREE.MeshStandardMaterial({ color: 0x445544, roughness: 0.5 });
-      const backpack = new THREE.Mesh(backpackGeo, backpackMat); backpack.position.set(0, 1.5, -0.5); group.add(backpack);
+      const lF = new THREE.Mesh(forearmGeo, forearmMat); lF.position.set(-0.75, 0.85, 0); lF.rotation.z = 0.2; group.add(lF);
+      const rF = new THREE.Mesh(forearmGeo, forearmMat); rF.position.set(0.75, 0.85, 0); rF.rotation.z = -0.2; group.add(rF);
+      // Cabeza con rostro
+      const headGeo = new THREE.SphereGeometry(0.42, 32, 32);
+      const head = new THREE.Mesh(headGeo, new THREE.MeshStandardMaterial({ color: 0xffccaa, roughness: 0.2 }));
+      head.position.y = 2.15; head.scale.set(1, 0.95, 1); group.add(head);
+      // Ojos
+      const eWGeo = new THREE.SphereGeometry(0.08, 8, 8);
+      const eWMat = new THREE.MeshStandardMaterial({ color: 0xffffff });
+      group.add(new THREE.Mesh(eWGeo, eWMat)).position.set(-0.14, 2.25, 0.38);
+      group.add(new THREE.Mesh(eWGeo, eWMat)).position.set(0.14, 2.25, 0.38);
+      // Iris
+      const irisG = new THREE.SphereGeometry(0.05, 6, 6);
+      const irisM = new THREE.MeshStandardMaterial({ color: 0x4422aa });
+      group.add(new THREE.Mesh(irisG, irisM)).position.set(-0.14, 2.25, 0.43);
+      group.add(new THREE.Mesh(irisG, irisM)).position.set(0.14, 2.25, 0.43);
+      // Pupilas
+      const pG = new THREE.SphereGeometry(0.03, 6, 6);
+      const pM = new THREE.MeshStandardMaterial({ color: 0x000000 });
+      group.add(new THREE.Mesh(pG, pM)).position.set(-0.14, 2.25, 0.46);
+      group.add(new THREE.Mesh(pG, pM)).position.set(0.14, 2.25, 0.46);
+      // Nariz
+      const noseG = new THREE.ConeGeometry(0.04, 0.08, 6);
+      const nose = new THREE.Mesh(noseG, new THREE.MeshStandardMaterial({ color: 0xffbb99 }));
+      nose.position.set(0, 2.18, 0.4); nose.rotation.x = Math.PI/2; group.add(nose);
+      // Boca
+      const mouthG = new THREE.BoxGeometry(0.1, 0.015, 0.02);
+      const mouth = new THREE.Mesh(mouthG, new THREE.MeshStandardMaterial({ color: 0xcc4444 }));
+      mouth.position.set(0, 2.08, 0.4); group.add(mouth);
+      // Pelo
+      const hairG = new THREE.SphereGeometry(0.44, 16, 8, 0, Math.PI*2, 0, Math.PI/2);
+      const hair = new THREE.Mesh(hairG, new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.6 }));
+      hair.position.y = 2.35; group.add(hair);
+      // Casco
+      const helmG = new THREE.SphereGeometry(0.44, 16, 8, 0, Math.PI*2, 0, Math.PI/2.5);
+      const helm = new THREE.Mesh(helmG, new THREE.MeshStandardMaterial({ color: 0x333333, roughness: 0.1, metalness: 0.9 }));
+      helm.position.y = 2.4; group.add(helm);
+      // Mochila
+      const bpG = new THREE.BoxGeometry(0.45, 0.65, 0.25);
+      const bp = new THREE.Mesh(bpG, new THREE.MeshStandardMaterial({ color: 0x445544, roughness: 0.5 }));
+      bp.position.set(0, 1.5, -0.5); group.add(bp);
+      
       return group;
     }
     
@@ -1037,8 +1085,7 @@
         body.position.y = height/2; body.castShadow = true; body.receiveShadow = true; mountainGroup.add(body);
         if (height > 25) {
           const snowGeo = new THREE.ConeGeometry(2.5, 4, 8);
-          const snow = new THREE.Mesh(snowGeo, new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.3 }));
-          snow.position.y = height - 2; mountainGroup.add(snow);
+          mountainGroup.add(new THREE.Mesh(snowGeo, new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.3 }))).position.y = height - 2;
         }
         const x = Math.cos(angle)*distance; const z = Math.sin(angle)*distance;
         mountainGroup.position.set(x, 0, z); scene.add(mountainGroup);
@@ -1049,11 +1096,9 @@
         const distance = 15 + Math.random() * 65;
         const treeGroup = new THREE.Group();
         const trunkGeo = new THREE.CylinderGeometry(0.5, 0.7, 5, 8);
-        const trunk = new THREE.Mesh(trunkGeo, new THREE.MeshStandardMaterial({ color: 0x8B4513, roughness: 0.7 }));
-        trunk.position.y = 2.5; trunk.castShadow = true; trunk.receiveShadow = true; treeGroup.add(trunk);
+        treeGroup.add(new THREE.Mesh(trunkGeo, new THREE.MeshStandardMaterial({ color: 0x8B4513, roughness: 0.7 }))).position.y = 2.5;
         const foliageGeo = new THREE.ConeGeometry(2.5, 6, 8);
-        const foliage = new THREE.Mesh(foliageGeo, new THREE.MeshStandardMaterial({ color: 0x2d5a27, roughness: 0.5 }));
-        foliage.position.y = 6; foliage.castShadow = true; treeGroup.add(foliage);
+        treeGroup.add(new THREE.Mesh(foliageGeo, new THREE.MeshStandardMaterial({ color: 0x2d5a27, roughness: 0.5 }))).position.y = 6;
         const x = Math.cos(angle)*distance; const z = Math.sin(angle)*distance;
         treeGroup.position.set(x, 0, z); scene.add(treeGroup);
         obstacles.push({ position: new THREE.Vector3(x, 0, z), radius: 1.5, height: 10 });
@@ -1063,11 +1108,9 @@
         const distance = 20 + Math.random() * 50;
         const houseGroup = new THREE.Group();
         const wallGeo = new THREE.BoxGeometry(5, 5, 5);
-        const wall = new THREE.Mesh(wallGeo, new THREE.MeshStandardMaterial({ color: 0xd4c5b2, roughness: 0.7 }));
-        wall.position.y = 2.5; wall.castShadow = true; wall.receiveShadow = true; houseGroup.add(wall);
+        houseGroup.add(new THREE.Mesh(wallGeo, new THREE.MeshStandardMaterial({ color: 0xd4c5b2, roughness: 0.7 }))).position.y = 2.5;
         const roofGeo = new THREE.ConeGeometry(4, 2.5, 4);
-        const roof = new THREE.Mesh(roofGeo, new THREE.MeshStandardMaterial({ color: 0x8b4513, roughness: 0.5 }));
-        roof.position.y = 5; roof.castShadow = true; houseGroup.add(roof);
+        houseGroup.add(new THREE.Mesh(roofGeo, new THREE.MeshStandardMaterial({ color: 0x8b4513, roughness: 0.5 }))).position.y = 5;
         const x = Math.cos(angle)*distance; const z = Math.sin(angle)*distance;
         houseGroup.position.set(x, 0, z); houseGroup.rotation.y = Math.random() * Math.PI * 2; scene.add(houseGroup);
         obstacles.push({ position: new THREE.Vector3(x, 0, z), radius: 3.5, height: 7 });
@@ -1091,9 +1134,17 @@
     
     function setupLobby() {
       if (lobbyModel) scene.remove(lobbyModel);
-      lobbyModel = createProCharacter(0xff5500);
+      lobbyModel = createCharacterWithFace(0xff5500);
       lobbyModel.position.set(0, 0.3, 0);
       scene.add(lobbyModel);
+      
+      // Arma en la mano derecha
+      weaponModel = createWeapon();
+      weaponModel.position.set(0.7, 1.2, 0.3);
+      weaponModel.rotation.z = -0.5;
+      weaponModel.rotation.y = 0.3;
+      lobbyModel.add(weaponModel);
+      
       camera.position.set(0, 3.5, 5.5);
       camera.lookAt(0, 2, 0);
     }
@@ -1134,7 +1185,7 @@
       currentState = State.PLAYING;
       if (planeGroup) { scene.remove(planeGroup); planeGroup = null; }
       if (playerModel) scene.remove(playerModel);
-      playerModel = createProCharacter(0x00aa88);
+      playerModel = createCharacterWithFace(0x00aa88);
       playerModel.position.copy(localPlayer.position);
       scene.add(playerModel);
       parachuteModel = createRealisticParachute();
@@ -1191,8 +1242,25 @@
     function updateGame(delta) {
       if (currentState === State.LOBBY && lobbyModel) {
         lobbyTime += delta;
+        // Animación de respiración
         lobbyModel.position.y = 0.3 + Math.sin(lobbyTime * 1.5) * 0.06;
-        lobbyModel.rotation.y += delta * 0.5;
+        
+        // Animación de rotación lenta
+        lobbyModel.rotation.y += delta * 0.4;
+        
+        // Animación del arma: inspeccionar
+        if (weaponModel) {
+          // Movimiento de balanceo del arma
+          weaponModel.position.x = 0.65 + Math.sin(lobbyTime * 2) * 0.05;
+          weaponModel.position.y = 1.15 + Math.cos(lobbyTime * 3) * 0.08;
+          weaponModel.rotation.z = -0.5 + Math.sin(lobbyTime * 2.5) * 0.2;
+          weaponModel.rotation.y = 0.3 + Math.cos(lobbyTime * 2) * 0.15;
+          weaponModel.rotation.x = Math.sin(lobbyTime * 3) * 0.1;
+        }
+        
+        // Movimiento de cabeza (mirar alrededor)
+        const headBone = lobbyModel.children.find(c => c.position.y > 2.1 && c.geometry && c.geometry.type === 'SphereGeometry');
+        
         const camX = Math.sin(lobbyTime * 0.4) * 2;
         const camZ = 5.5 + Math.cos(lobbyTime * 0.4) * 1.5;
         camera.position.lerp(new THREE.Vector3(camX, 3.5, camZ), 0.03);
@@ -1228,7 +1296,7 @@
             newPos.z += dir.z * speed * delta;
             if (!checkCollision(newPos)) localPlayer.position.copy(newPos);
             const targetAngle = Math.atan2(dir.x, dir.z);
-            playerModel.rotation.y += (targetAngle - playerModel.rotation.y) * 0.2;
+            playerModel.rotation.y += (targetAngle - playerModel.rotation.y) * 0.25;
           }
         }
         playerModel.position.copy(localPlayer.position);
