@@ -1101,8 +1101,8 @@
         (gltf) => {
           if (lobbyModel) scene.remove(lobbyModel);
           lobbyModel = gltf.scene;
-          lobbyModel.scale.set(1, 1, 1);
-          lobbyModel.position.set(0, 0.3, 0);
+lobbyModel.scale.set(2, 2, 2);    // Empieza con 2
+lobbyModel.position.set(0, 0.3, 0);
           scene.add(lobbyModel);
           
           // Intentar añadir arma al modelo cargado
