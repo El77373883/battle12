@@ -3493,7 +3493,16 @@ function createDetailedSakura(x, z) {
 
     function setupLobby() {
       if (lobbyModel) scene.remove(lobbyModel);
-      weaponModel = null; // No weapon floating in lobby
+      weaponModel = null;
+      // Suelo simple para el lobby
+      const lobbyGround = new THREE.Mesh(
+        new THREE.CircleGeometry(3, 32),
+        new THREE.MeshStandardMaterial({color: 0x2a3a1a, roughness: 0.8})
+      );
+      lobbyGround.rotation.x = -Math.PI/2;
+      lobbyGround.position.y = -0.15;
+      lobbyGround.name = 'lobbyGround';
+      scene.add(lobbyGround);
       loadCustomModel();
       updateLobbyCamera();
     }
@@ -3521,6 +3530,9 @@ function createDetailedSakura(x, z) {
     function startPlaneSequence() {
       currentState = State.PLANE;
       if (lobbyModel) scene.remove(lobbyModel);
+      // Quitar suelo del lobby
+      const lg = scene.getObjectByName('lobbyGround');
+      if (lg) scene.remove(lg);
       planeGroup = createRealisticPlane();
       planeGroup.position.set(-400, 120, -400);
       planeGroup.rotation.y=Math.PI/4; planeGroup.rotation.z=-0.05; planeGroup.rotation.x=0.05;
