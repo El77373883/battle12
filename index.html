@@ -1823,7 +1823,7 @@
     let currentState = State.LOBBY;
 
     const canvas = document.getElementById('game-canvas');
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: false });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.shadowMap.enabled = true;
@@ -4008,7 +4008,7 @@ camera.lookAt(0, 2, 0);
       renderer.render(scene, camera);
     }
 
-    createBeautifulWorld();
+    // createBeautifulWorld();
     setupLobby();
     animate();
 
