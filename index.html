@@ -2576,76 +2576,21 @@ function createDetailedSakura(x, z) {
     const group = new THREE.Group();
     group.userData.isTree = true;
 
-    // TRONCO PRINCIPAL
-    const trunkGeometry = new THREE.CylinderGeometry(0.5, 0.8, 8, 8);
-    const trunkMaterial = new THREE.MeshStandardMaterial({ 
-        color: 0x3d2b1f, 
-        roughness: 0.9,
-        metalness: 0.1,
-        flatShading: true
-    });
-    const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
-    trunk.position.y = 2;
+    // Tronco simple
+    const trunkGeo = new THREE.CylinderGeometry(0.5, 0.7, 6, 8);
+    const trunkMat = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
+    const trunk = new THREE.Mesh(trunkGeo, trunkMat);
+    trunk.position.y = 3;
     trunk.castShadow = true;
     group.add(trunk);
 
-    // RAMAS Y FLORES
-    const branchMaterial = new THREE.MeshStandardMaterial({ color: 0x3d2b1f, roughness: 0.8 });
-    
-    for (let i = 0; i < 6; i++) {
-        const branchHeight = 1.5 + Math.random() * 2;
-        const branch = new THREE.Mesh(
-            new THREE.CylinderGeometry(0.05, 0.15, branchHeight, 5),
-            branchMaterial
-        );
-        branch.position.y = 2 + Math.random() * 1.5;
-        branch.rotation.z = (Math.random() - 0.5) * 1.5;
-        branch.rotation.x = (Math.random() - 0.5) * 1.5;
-        group.add(branch);
-
-        const flowerColors = [0xffb7c5, 0xff91af, 0xf77fbe, 0xffc0cb, 0xffd1dc, 0xff88aa];
-        
-        for (let j = 0; j < 30; j++) {
-            const flowerSize = 0.4 + Math.random() * 0.8;
-            const flowerGeo = new THREE.SphereGeometry(flowerSize, 5, 5);
-            const flowerMat = new THREE.MeshStandardMaterial({
-                color: flowerColors[Math.floor(Math.random() * flowerColors.length)],
-                roughness: 0.5,
-                transparent: true,
-                opacity: 0.9
-            });
-            const flower = new THREE.Mesh(flowerGeo, flowerMat);
-            flower.position.set(
-                branch.position.x + (Math.random() - 0.5) * 2.5,
-                branch.position.y + (Math.random() * 1.5),
-                branch.position.z + (Math.random() - 0.5) * 2.5
-            );
-            flower.castShadow = true;
-            group.add(flower);
-        }
-    }
-
-    // PÉTALOS EN EL SUELO
-    for (let p = 0; p < 12; p++) {
-        const petal = new THREE.Mesh(
-            new THREE.PlaneGeometry(0.12, 0.08),
-            new THREE.MeshStandardMaterial({ 
-                color: 0xffb7c5, 
-                side: THREE.DoubleSide,
-                transparent: true,
-                opacity: 0.7,
-                roughness: 0.8
-            })
-        );
-        petal.position.set(
-            (Math.random() - 0.5) * 3.5,
-            0.03, 
-            (Math.random() - 0.5) * 3.5
-        );
-        petal.rotation.x = -Math.PI / 2;
-        petal.rotation.z = Math.random() * Math.PI;
-        group.add(petal);
-    }
+    // Copa rosa (esfera simple)
+    const crownGeo = new THREE.SphereGeometry(3, 8, 8);
+    const crownMat = new THREE.MeshStandardMaterial({ color: 0xff69b4 });
+    const crown = new THREE.Mesh(crownGeo, crownMat);
+    crown.position.y = 7;
+    crown.castShadow = true;
+    group.add(crown);
 
     group.position.set(x, 0, z);
     return group;
