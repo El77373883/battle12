@@ -2578,6 +2578,44 @@
         mGroup.position.set(x,0,z); scene.add(mGroup);
         obstacles.push({position:new THREE.Vector3(x,0,z),radius:10,height});
       }
+      
+      // ===== CÉSPED 3D =====
+      const grassAreas = [];
+      // Crear 30 grupos de césped decorativo
+      for (let g = 0; g < 30; g++) {
+        const gAngle = Math.random() * Math.PI * 2;
+        const gDist = 5 + Math.random() * 80;
+        const gx = Math.cos(gAngle) * gDist;
+        const gz = Math.sin(gAngle) * gDist;
+        grassAreas.push({x: gx, z: gz});
+      }
+      
+      grassAreas.forEach(pos => {
+        const grassGroup = new THREE.Group();
+        const grassMat1 = new THREE.MeshStandardMaterial({color: 0x2d6e1a, roughness: 0.8, side: THREE.DoubleSide});
+        const grassMat2 = new THREE.MeshStandardMaterial({color: 0x3a7a2a, roughness: 0.7, side: THREE.DoubleSide});
+        const grassMat3 = new THREE.MeshStandardMaterial({color: 0x1e5c1e, roughness: 0.9, side: THREE.DoubleSide});
+        
+        for (let j = 0; j < 15; j++) {
+          const bladeMat = [grassMat1, grassMat2, grassMat3][Math.floor(Math.random() * 3)];
+          const bladeGeo = new THREE.PlaneGeometry(0.08, 0.3 + Math.random() * 0.6);
+          const blade = new THREE.Mesh(bladeGeo, bladeMat);
+          
+          blade.position.set(
+            (Math.random() - 0.5) * 1.5,
+            0.15 + Math.random() * 0.3,
+            (Math.random() - 0.5) * 1.5
+          );
+          blade.rotation.y = Math.random() * Math.PI;
+          blade.rotation.z = (Math.random() - 0.5) * 0.3;
+          blade.rotation.x = (Math.random() - 0.5) * 0.3;
+          
+          grassGroup.add(blade);
+        }
+        grassGroup.position.set(pos.x, 0, pos.z);
+        scene.add(grassGroup);
+      });
+      
       // ===== REALISTIC TREES =====
       const treeColors = [0x2d6e2a, 0x1e5c1e, 0x3a7a30, 0x256325, 0x4a8c3f];
       const trunkColors = [0x6b3a1f, 0x7a4520, 0x5c3215, 0x8b4513];
@@ -2918,6 +2956,16 @@
         lobbyTime += delta;
         lobbyModel.position.y = 0.3 + Math.sin(lobbyTime * 1.5) * 0.06;
         lobbyModel.rotation.y += delta * 0.35;
+        // Movimiento del césped con viento
+        scene.children.forEach(child => {
+          if (child.isGroup && child.children.length === 15) {
+            child.children.forEach(blade => {
+              if (blade.isMesh && blade.geometry.type === 'PlaneGeometry') {
+                blade.rotation.z += Math.sin(lobbyTime * 3 + blade.position.x) * 0.002;
+              }
+            });
+          }
+        });
         const camX = Math.sin(lobbyTime * 0.35) * 1.8;
         const camZ = 5.5 + Math.cos(lobbyTime * 0.35) * 1.2;
         camera.position.lerp(new THREE.Vector3(camX, 3.5, camZ), 0.03);
