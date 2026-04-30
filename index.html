@@ -2564,33 +2564,99 @@
       return group;
     }
 
-    // ===== WORLD =====
+// ===== WORLD =====
     function createBeautifulWorld() {
-      const ground = new THREE.Mesh(new THREE.CircleGeometry(120,64), new THREE.MeshStandardMaterial({color:0x4a7c4f,roughness:0.8}));
-      ground.rotation.x=-Math.PI/2; ground.position.y=-0.1; ground.receiveShadow=true; scene.add(ground);
-      for (let i=0;i<10;i++) {
-        const angle=(i/10)*Math.PI*2, distance=45+Math.random()*40, height=12+Math.random()*25;
-        const mGroup=new THREE.Group();
-        const body=new THREE.Mesh(new THREE.ConeGeometry(6+Math.random()*8,height,8),new THREE.MeshStandardMaterial({color:0x5a7d5a,roughness:0.6}));
-        body.position.y=height/2; body.castShadow=true; mGroup.add(body);
-        if (height>25) { const snow=new THREE.Mesh(new THREE.ConeGeometry(2.5,4,8),new THREE.MeshStandardMaterial({color:0xffffff,roughness:0.3})); snow.position.y=height-2; mGroup.add(snow); }
-        const x=Math.cos(angle)*distance, z=Math.sin(angle)*distance;
-        mGroup.position.set(x,0,z); scene.add(mGroup);
-        obstacles.push({position:new THREE.Vector3(x,0,z),radius:10,height});
+      // Suelo principal 1000x1000
+      const ground = new THREE.Mesh(
+        new THREE.CircleGeometry(1000, 128),
+        new THREE.MeshStandardMaterial({color:0x3d6b3d, roughness:0.85})
+      );
+      ground.rotation.x = -Math.PI/2;
+      ground.position.y = -0.1;
+      ground.receiveShadow = true;
+      scene.add(ground);
+      
+      // ===== GRANDES MONTAÑAS =====
+      for (let i = 0; i < 30; i++) {
+        const angle = (i / 30) * Math.PI * 2 + Math.random() * 0.3;
+        const distance = 80 + Math.random() * 750;
+        const height = 30 + Math.random() * 120;
+        const mGroup = new THREE.Group();
+        
+        const bodyGeo = new THREE.ConeGeometry(15 + Math.random() * 35, height, 12);
+        const bodyMat = new THREE.MeshStandardMaterial({
+          color: new THREE.Color().setHSL(0.25 + Math.random() * 0.1, 0.3, 0.3 + Math.random() * 0.3),
+          roughness: 0.7,
+          flatShading: true
+        });
+        const body = new THREE.Mesh(bodyGeo, bodyMat);
+        body.position.y = height / 2;
+        body.castShadow = true;
+        mGroup.add(body);
+        
+        if (height > 80) {
+          const snowGeo = new THREE.ConeGeometry(8 + Math.random() * 10, height * 0.25, 10);
+          const snowMat = new THREE.MeshStandardMaterial({color: 0xffffff, roughness: 0.4, flatShading: true});
+          const snow = new THREE.Mesh(snowGeo, snowMat);
+          snow.position.y = height - height * 0.12;
+          mGroup.add(snow);
+        }
+        
+        for (let r = 0; r < 8; r++) {
+          const rockGeo = new THREE.DodecahedronGeometry(1 + Math.random() * 4, 1);
+          const rockMat = new THREE.MeshStandardMaterial({color: 0x666666, roughness: 0.8, flatShading: true});
+          const rock = new THREE.Mesh(rockGeo, rockMat);
+          const rAngle = Math.random() * Math.PI * 2;
+          const rDist = 18 + Math.random() * 30;
+          rock.position.set(Math.cos(rAngle) * rDist, Math.random() * 3, Math.sin(rAngle) * rDist);
+          rock.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
+          rock.scale.setScalar(0.5 + Math.random() * 1.5);
+          mGroup.add(rock);
+        }
+        
+        const x = Math.cos(angle) * distance;
+        const z = Math.sin(angle) * distance;
+        mGroup.position.set(x, 0, z);
+        scene.add(mGroup);
+        obstacles.push({position: new THREE.Vector3(x, 0, z), radius: 25, height: height});
+      }
+      
+      // ===== LAGOS =====
+      for (let l = 0; l < 8; l++) {
+        const lAngle = Math.random() * Math.PI * 2;
+        const lDist = 60 + Math.random() * 700;
+        const lx = Math.cos(lAngle) * lDist;
+        const lz = Math.sin(lAngle) * lDist;
+        
+        const lakeGeo = new THREE.CircleGeometry(8 + Math.random() * 25, 32);
+        const lakeMat = new THREE.MeshStandardMaterial({
+          color: 0x2266aa, roughness: 0.1, metalness: 0.6, transparent: true, opacity: 0.85
+        });
+        const lake = new THREE.Mesh(lakeGeo, lakeMat);
+        lake.rotation.x = -Math.PI / 2;
+        lake.position.set(lx, 0.05, lz);
+        scene.add(lake);
+        
+        const shoreGeo = new THREE.TorusGeometry(8 + Math.random() * 25, 1.5 + Math.random() * 2, 8, 32);
+        const shoreMat = new THREE.MeshStandardMaterial({color: 0x8a7a5a, roughness: 0.9, flatShading: true});
+        const shore = new THREE.Mesh(shoreGeo, shoreMat);
+        shore.rotation.x = -Math.PI / 2;
+        shore.position.set(lx, 0.08, lz);
+        scene.add(shore);
+        
+        for (let lr = 0; lr < 6; lr++) {
+          const lrAngle = Math.random() * Math.PI * 2;
+          const lrDist = 10 + Math.random() * 25;
+          const rockGeo = new THREE.DodecahedronGeometry(0.5 + Math.random() * 2, 1);
+          const rockMat = new THREE.MeshStandardMaterial({color: 0x777777, roughness: 0.7, flatShading: true});
+          const rock = new THREE.Mesh(rockGeo, rockMat);
+          rock.position.set(lx + Math.cos(lrAngle) * lrDist, 0.2 + Math.random() * 0.5, lz + Math.sin(lrAngle) * lrDist);
+          rock.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
+          scene.add(rock);
+        }
       }
       
       // ===== CÉSPED 3D DETALLADO =====
-      const grassAreas = [];
-      // Crear 80 grupos de césped (el doble)
-      for (let g = 0; g < 80; g++) {
-        const gAngle = Math.random() * Math.PI * 2;
-        const gDist = 3 + Math.random() * 90;
-        const gx = Math.cos(gAngle) * gDist;
-        const gz = Math.sin(gAngle) * gDist;
-        grassAreas.push({x: gx, z: gz});
-      }
-      
-      // Colores de césped más vivos y variados
       const grassColors = [
         new THREE.MeshStandardMaterial({color: 0x44bb2a, roughness: 0.5, side: THREE.DoubleSide}),
         new THREE.MeshStandardMaterial({color: 0x55cc33, roughness: 0.4, side: THREE.DoubleSide}),
@@ -2600,75 +2666,60 @@
         new THREE.MeshStandardMaterial({color: 0x88ee55, roughness: 0.35, side: THREE.DoubleSide}),
       ];
       
-      grassAreas.forEach(pos => {
+      for (let g = 0; g < 500; g++) {
+        const gAngle = Math.random() * Math.PI * 2;
+        const gDist = 3 + Math.random() * 900;
+        const gx = Math.cos(gAngle) * gDist;
+        const gz = Math.sin(gAngle) * gDist;
+        
         const grassGroup = new THREE.Group();
         grassGroup.userData.isGrass = true;
         
-        // Más hojas por grupo (20 en vez de 15)
         for (let j = 0; j < 20; j++) {
           const bladeMat = grassColors[Math.floor(Math.random() * grassColors.length)];
-          // Hojas más grandes y variadas
           const bladeGeo = new THREE.PlaneGeometry(0.12 + Math.random() * 0.2, 0.5 + Math.random() * 1.8);
           const blade = new THREE.Mesh(bladeGeo, bladeMat);
           
-          blade.position.set(
-            (Math.random() - 0.5) * 2.0,
-            0.2 + Math.random() * 0.5,
-            (Math.random() - 0.5) * 2.0
-          );
+          blade.position.set((Math.random() - 0.5) * 2.0, 0.2 + Math.random() * 0.5, (Math.random() - 0.5) * 2.0);
           blade.rotation.y = Math.random() * Math.PI * 2;
           blade.rotation.z = (Math.random() - 0.5) * 0.4;
           blade.rotation.x = (Math.random() - 0.5) * 0.4;
           
           grassGroup.add(blade);
         }
-        grassGroup.position.set(pos.x, -0.05, pos.z);
+        grassGroup.position.set(gx, -0.05, gz);
         scene.add(grassGroup);
-      });
+      }
       
       // ===== ROCAS DECORATIVAS =====
       const rockColors = [0x888888, 0x999999, 0x777777, 0xaaaaaa, 0x666666, 0x8a8a7a, 0x9a9a8a];
-      for (let r = 0; r < 25; r++) {
+      for (let r = 0; r < 120; r++) {
         const rAngle = Math.random() * Math.PI * 2;
-        const rDist = 5 + Math.random() * 85;
+        const rDist = 5 + Math.random() * 880;
         const rx = Math.cos(rAngle) * rDist;
         const rz = Math.sin(rAngle) * rDist;
         
         const rockGroup = new THREE.Group();
         rockGroup.userData.isRock = true;
         
-        // Roca principal
         const rockMat = new THREE.MeshStandardMaterial({
           color: rockColors[Math.floor(Math.random() * rockColors.length)],
-          roughness: 0.7,
-          metalness: 0.1,
-          flatShading: true
+          roughness: 0.7, metalness: 0.1, flatShading: true
         });
         
         const mainRock = new THREE.Mesh(
-          new THREE.DodecahedronGeometry(0.3 + Math.random() * 1.2, 1),
-          rockMat
+          new THREE.DodecahedronGeometry(0.3 + Math.random() * 1.5, 1), rockMat
         );
         mainRock.position.set(0, 0.1, 0);
         mainRock.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
-        mainRock.scale.set(
-          0.6 + Math.random() * 1.4,
-          0.4 + Math.random() * 0.8,
-          0.6 + Math.random() * 1.4
-        );
+        mainRock.scale.set(0.6 + Math.random() * 1.8, 0.4 + Math.random() * 1.0, 0.6 + Math.random() * 1.8);
         rockGroup.add(mainRock);
         
-        // Piedritas alrededor
         for (let s = 0; s < 3 + Math.floor(Math.random() * 5); s++) {
           const smallRock = new THREE.Mesh(
-            new THREE.DodecahedronGeometry(0.1 + Math.random() * 0.3, 0),
-            rockMat.clone()
+            new THREE.DodecahedronGeometry(0.1 + Math.random() * 0.4, 0), rockMat.clone()
           );
-          smallRock.position.set(
-            (Math.random() - 0.5) * 1.5,
-            0.05,
-            (Math.random() - 0.5) * 1.5
-          );
+          smallRock.position.set((Math.random() - 0.5) * 2.0, 0.05, (Math.random() - 0.5) * 2.0);
           smallRock.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
           rockGroup.add(smallRock);
         }
@@ -2677,67 +2728,120 @@
         scene.add(rockGroup);
       }
       
-      // ===== REALISTIC TREES =====
-      const treeColors = [0x2d6e2a, 0x1e5c1e, 0x3a7a30, 0x256325, 0x4a8c3f];
-      const trunkColors = [0x6b3a1f, 0x7a4520, 0x5c3215, 0x8b4513];
-      for (let i=0;i<60;i++) {
-        const angle=Math.random()*Math.PI*2, distance=15+Math.random()*70;
-        const tGroup=new THREE.Group();
-        const tH = 10 + Math.random()*14; // 10 to 24 tall
-        const tR = 0.7 + Math.random()*0.6;
-        const trunkMat = new THREE.MeshStandardMaterial({color:trunkColors[Math.floor(Math.random()*trunkColors.length)],roughness:0.9});
-        const trunk=new THREE.Mesh(new THREE.CylinderGeometry(tR*0.55,tR,tH*0.45,10),trunkMat);
-        trunk.position.y=tH*0.22; trunk.castShadow=true; tGroup.add(trunk);
-        // 3-layer foliage for realistic look
-        const leafColor = treeColors[Math.floor(Math.random()*treeColors.length)];
-        const leafMat = new THREE.MeshStandardMaterial({color:leafColor,roughness:0.7});
-        const leafMat2 = new THREE.MeshStandardMaterial({color:new THREE.Color(leafColor).offsetHSL(0,0,-0.07),roughness:0.7});
-        const f1=new THREE.Mesh(new THREE.ConeGeometry(tR*3.5+Math.random()*1.5, tH*0.45, 9),leafMat);
-        f1.position.y=tH*0.38; f1.castShadow=true; tGroup.add(f1);
-        const f2=new THREE.Mesh(new THREE.ConeGeometry(tR*2.8+Math.random()*1.2, tH*0.38, 9),leafMat2);
-        f2.position.y=tH*0.55; f2.castShadow=true; tGroup.add(f2);
-        const f3=new THREE.Mesh(new THREE.ConeGeometry(tR*1.8+Math.random()*0.8, tH*0.28, 9),leafMat);
-        f3.position.y=tH*0.72; f3.castShadow=true; tGroup.add(f3);
-        // top tip
-        const tip=new THREE.Mesh(new THREE.ConeGeometry(tR*0.7, tH*0.2, 7),leafMat2);
-        tip.position.y=tH*0.88; tGroup.add(tip);
-        const x=Math.cos(angle)*distance, z=Math.sin(angle)*distance;
-        tGroup.position.set(x,0,z); tGroup.rotation.y=Math.random()*Math.PI*2; scene.add(tGroup);
-        obstacles.push({position:new THREE.Vector3(x,0,z),radius:2.5,height:tH});
-      }
-      // ===== BIG DETAILED HOUSES =====
-      const wallColors = [0xd4c5a9, 0xe8dcc8, 0xc8b89a, 0xbcad96, 0xd9cdb8];
-      const roofColors = [0x7a3a1a, 0x9c4f1e, 0x5a2a10, 0x8b3a14];
-      for (let i=0;i<15;i++) {
-        const angle=Math.random()*Math.PI*2, distance=20+Math.random()*55;
-        const hGroup=new THREE.Group();
-        const wW=9+Math.random()*5, wD=9+Math.random()*5, wH=7+Math.random()*4;
-        const wallMat=new THREE.MeshStandardMaterial({color:wallColors[i%wallColors.length],roughness:0.75});
-        const walls=new THREE.Mesh(new THREE.BoxGeometry(wW,wH,wD),wallMat);
-        walls.position.y=wH/2; walls.castShadow=true; walls.receiveShadow=true; hGroup.add(walls);
-        // roof
-        const roofMat=new THREE.MeshStandardMaterial({color:roofColors[i%roofColors.length],roughness:0.6});
-        const roof=new THREE.Mesh(new THREE.ConeGeometry(Math.max(wW,wD)*0.78,wH*0.55,4),roofMat);
-        roof.position.y=wH+wH*0.22; roof.rotation.y=Math.PI/4; roof.castShadow=true; hGroup.add(roof);
-        // windows (simple dark squares on sides)
-        const winMat=new THREE.MeshStandardMaterial({color:0x88ccff,roughness:0.1,emissive:new THREE.Color(0x112233)});
-        for (let w=0;w<2;w++) {
-          const win=new THREE.Mesh(new THREE.BoxGeometry(1.2,1.2,0.1),winMat);
-          win.position.set(-wW*0.2+w*wW*0.4, wH*0.5, wD*0.501); hGroup.add(win);
-          const win2=new THREE.Mesh(new THREE.BoxGeometry(1.2,1.2,0.1),winMat);
-          win2.position.set(-wW*0.2+w*wW*0.4, wH*0.5, -wD*0.501); hGroup.add(win2);
+      // ===== PINOS DETALLADOS =====
+      const trunkColors = [0x5c3a1e, 0x6b4520, 0x4a2a10, 0x7a5530, 0x3d2010];
+      const pineColors = [0x1a5c1a, 0x1e6b1e, 0x156315, 0x1a7a1a, 0x0d4d0d, 0x1f6f1f];
+      
+      for (let i = 0; i < 300; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const distance = 15 + Math.random() * 850;
+        const tGroup = new THREE.Group();
+        tGroup.userData.isTree = true;
+        
+        const tH = 8 + Math.random() * 25;
+        const tR = 0.4 + Math.random() * 0.8;
+        
+        const trunkMat = new THREE.MeshStandardMaterial({
+          color: trunkColors[Math.floor(Math.random() * trunkColors.length)], roughness: 0.9, flatShading: true
+        });
+        const trunk = new THREE.Mesh(
+          new THREE.CylinderGeometry(tR * 0.3, tR * 0.5, tH * 0.4, 8), trunkMat
+        );
+        trunk.position.y = tH * 0.2;
+        trunk.castShadow = true;
+        tGroup.add(trunk);
+        
+        const pineColor = pineColors[Math.floor(Math.random() * pineColors.length)];
+        const pineMat1 = new THREE.MeshStandardMaterial({color: pineColor, roughness: 0.7, flatShading: true});
+        const pineMat2 = new THREE.MeshStandardMaterial({
+          color: new THREE.Color(pineColor).offsetHSL(0.03, 0, 0.05), roughness: 0.7, flatShading: true
+        });
+        
+        for (let layer = 0; layer < 4; layer++) {
+          const layerMat = layer % 2 === 0 ? pineMat1 : pineMat2;
+          const coneGeo = new THREE.ConeGeometry(tR * 3.5 - layer * 0.7 + Math.random() * 0.5, tH * 0.28, 8);
+          const cone = new THREE.Mesh(coneGeo, layerMat);
+          cone.position.y = tH * 0.35 + layer * tH * 0.15;
+          cone.castShadow = true;
+          tGroup.add(cone);
         }
-        // door
-        const doorMat=new THREE.MeshStandardMaterial({color:0x4a2a0a,roughness:0.8});
-        const door=new THREE.Mesh(new THREE.BoxGeometry(1.4,2.5,0.15),doorMat);
-        door.position.set(0,1.25,wD*0.501); hGroup.add(door);
-        // foundation
-        const foundMat=new THREE.MeshStandardMaterial({color:0x888888,roughness:0.9});
-        const found=new THREE.Mesh(new THREE.BoxGeometry(wW+0.6,0.4,wD+0.6),foundMat);
-        found.position.y=0.2; hGroup.add(found);
-        const x=Math.cos(angle)*distance, z=Math.sin(angle)*distance;
-        hGroup.position.set(x,0,z); hGroup.rotation.y=Math.random()*Math.PI*2; scene.add(hGroup);
-        obstacles.push({position:new THREE.Vector3(x,0,z),radius:6,height:wH+4});
+        
+        const tipGeo = new THREE.ConeGeometry(tR * 0.5, tH * 0.18, 6);
+        const tip = new THREE.Mesh(tipGeo, pineMat2);
+        tip.position.y = tH * 0.35 + 4 * tH * 0.15 + tH * 0.08;
+        tip.castShadow = true;
+        tGroup.add(tip);
+        
+        const x = Math.cos(angle) * distance;
+        const z = Math.sin(angle) * distance;
+        tGroup.position.set(x, 0, z);
+        tGroup.rotation.y = Math.random() * Math.PI * 2;
+        scene.add(tGroup);
+        obstacles.push({position: new THREE.Vector3(x, 0, z), radius: 2.5, height: tH});
+      }
+      
+      // ===== CASAS DETALLADAS =====
+      const wallColors = [0xd4c5a9, 0xe8dcc8, 0xc8b89a, 0xbcad96, 0xd9cdb8];
+      const roofColors = [0x7a3a1a, 0x9c4f1e, 0x5a2a10, 0x8b3a14, 0x6b2a0a];
+      
+      for (let i = 0; i < 50; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const distance = 25 + Math.random() * 800;
+        const hGroup = new THREE.Group();
+        hGroup.userData.isHouse = true;
+        
+        const wW = 7 + Math.random() * 6;
+        const wD = 7 + Math.random() * 6;
+        const wH = 6 + Math.random() * 5;
+        
+        const wallMat = new THREE.MeshStandardMaterial({
+          color: wallColors[i % wallColors.length], roughness: 0.75, flatShading: true
+        });
+        const walls = new THREE.Mesh(new THREE.BoxGeometry(wW, wH, wD), wallMat);
+        walls.position.y = wH / 2;
+        walls.castShadow = true;
+        walls.receiveShadow = true;
+        hGroup.add(walls);
+        
+        const roofMat = new THREE.MeshStandardMaterial({
+          color: roofColors[i % roofColors.length], roughness: 0.6, flatShading: true
+        });
+        const roof = new THREE.Mesh(
+          new THREE.ConeGeometry(Math.max(wW, wD) * 0.78, wH * 0.55, 4), roofMat
+        );
+        roof.position.y = wH + wH * 0.22;
+        roof.rotation.y = Math.PI / 4;
+        roof.castShadow = true;
+        hGroup.add(roof);
+        
+        const winMat = new THREE.MeshStandardMaterial({
+          color: 0x88ccff, roughness: 0.1, emissive: new THREE.Color(0x112233), flatShading: true
+        });
+        for (let w = 0; w < 2; w++) {
+          const win = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1.2, 0.1), winMat);
+          win.position.set(-wW * 0.2 + w * wW * 0.4, wH * 0.5, wD * 0.501);
+          hGroup.add(win);
+          const win2 = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1.2, 0.1), winMat);
+          win2.position.set(-wW * 0.2 + w * wW * 0.4, wH * 0.5, -wD * 0.501);
+          hGroup.add(win2);
+        }
+        
+        const doorMat = new THREE.MeshStandardMaterial({color: 0x4a2a0a, roughness: 0.8, flatShading: true});
+        const door = new THREE.Mesh(new THREE.BoxGeometry(1.4, 2.5, 0.15), doorMat);
+        door.position.set(0, 1.25, wD * 0.501);
+        hGroup.add(door);
+        
+        const foundMat = new THREE.MeshStandardMaterial({color: 0x888888, roughness: 0.9, flatShading: true});
+        const found = new THREE.Mesh(new THREE.BoxGeometry(wW + 0.6, 0.4, wD + 0.6), foundMat);
+        found.position.y = 0.2;
+        hGroup.add(found);
+        
+        const x = Math.cos(angle) * distance;
+        const z = Math.sin(angle) * distance;
+        hGroup.position.set(x, 0, z);
+        hGroup.rotation.y = Math.random() * Math.PI * 2;
+        scene.add(hGroup);
+        obstacles.push({position: new THREE.Vector3(x, 0, z), radius: 6, height: wH + 4});
       }
     }
 
