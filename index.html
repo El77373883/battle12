@@ -3898,6 +3898,48 @@ function renderPaseRewards() {
     grid.appendChild(div);
   });
 }
+
+
+function claimReward(reward) {
+  const level = reward.level;
+  
+  if (localStorage.getItem('pase_claimed_' + level) === 'true') {
+    alert('✅ Ya reclamaste esta recompensa');
+    return;
+  }
+  
+  if (paseSakuraData.level < reward.level) {
+    alert('⚠️ Necesitas nivel ' + reward.level + ' (Tu nivel: ' + paseSakuraData.level + ')');
+    return;
+  }
+  
+  if (reward.type === 'basico' && paseSakuraData.type === 'none') {
+    alert('🔒 ¡Necesitas el Pase Básico (600 💎)!');
+    return;
+  }
+  if (reward.type === 'elite' && paseSakuraData.type !== 'elite') {
+    alert('👑 ¡Necesitas el Pase Élite (1200 💎)!');
+    return;
+  }
+  
+  let msg = '🎁 ¡RECOMPENSA RECLAMADA!\n\n';
+  if (reward.diamonds) { paseSakuraData.diamonds += reward.diamonds; msg += '💎 +' + reward.diamonds + ' Diamantes\n'; }
+  if (reward.gold) { paseSakuraData.gold += reward.gold; msg += '🪙 +' + reward.gold + ' Oro\n'; }
+  if (reward.medals) {
+    paseSakuraData.medals = Math.min(200, paseSakuraData.medals + reward.medals);
+    msg += '🏅 +' + reward.medals + ' Medallas Sakura\n';
+    document.getElementById('total-medals-count').textContent = paseSakuraData.medals + ' / 200';
+  }
+  if (reward.special) msg += '🌟 ' + reward.name + ' desbloqueado\n';
+  
+  localStorage.setItem('pase_claimed_' + level, 'true');
+  updateCurrencyDisplay();
+  updateProfileMedals();
+  renderPaseRewards();
+  alert(msg);
+}
+
+
 // Inicializar el Pase Sakura
 function initPaseSakura() {
   document.getElementById('total-medals-count').textContent = paseSakuraData.medals + ' / ' + paseSakuraData.maxMedals;
@@ -3923,10 +3965,6 @@ document.getElementById('close-pase-sakura').addEventListener('click', () => {
   document.getElementById('pase-sakura-overlay').classList.remove('active');
 });
 
-// Actualizar perfil cuando se abre
-profileTrigger.addEventListener('click', () => {
-  setTimeout(() => updateProfileMedals(), 100);
-});
 
 // Notificación inicial
 setTimeout(() => {
