@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>💀 OMEGA STRIKE</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #000;
+      overflow: hidden;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      width: 100%; height: 100%;
+      position: fixed;
+      touch-action: manipulation;
+    }
+    #intro-container {
+      position: fixed; inset: 0;
+      background: #000;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      z-index: 9999;
+    }
+    canvas { position: absolute; inset: 0; z-index: 1; }
+
+    /* Texto principal */
+    .intro-text-wrap {
+      position: relative; z-index: 10;
+      text-align: center;
+      opacity: 0;
+      animation: fadeInText 0.6s ease-out 0.5s forwards;
+    }
+    @keyframes fadeInText {
+      0%   { opacity: 0; transform: scale(0.85); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    .intro-title {
+      font-size: clamp(32px, 8vw, 64px);
+      font-weight: 900;
+      letter-spacing: 4px;
+      color: transparent;
+      background: linear-gradient(180deg, #ffe033 0%, #ff9500 50%, #cc5500 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      text-shadow: none;
+      filter: drop-shadow(0 0 20px rgba(255,140,0,0.8)) drop-shadow(0 4px 8px rgba(0,0,0,0.9));
+      animation: titleGlow 2s ease-in-out infinite alternate;
+      line-height: 1.1;
+    }
+    @keyframes titleGlow {
+      0%   { filter: drop-shadow(0 0 20px rgba(255,140,0,0.8)) drop-shadow(0 4px 8px rgba(0,0,0,0.9)); }
+      100% { filter: drop-shadow(0 0 35px rgba(255,200,0,1)) drop-shadow(0 6px 16px rgba(255,100,0,0.8)); }
+    }
+
+    .intro-subtitle {
+      font-size: clamp(18px, 5vw, 32px);
+      font-weight: 900;
+      letter-spacing: 6px;
+      color: #fff;
+      text-shadow: 0 0 30px rgba(255,255,255,0.6), 0 2px 8px rgba(0,0,0,0.9);
+      margin-top: 4px;
+      animation: subtitlePulse 1.5s ease-in-out infinite alternate;
+    }
+    @keyframes subtitlePulse {
+      0%   { opacity: 0.7; text-shadow: 0 0 20px rgba(255,255,255,0.4); }
+      100% { opacity: 1;   text-shadow: 0 0 40px rgba(255,255,255,0.9), 0 0 80px rgba(255,200,0,0.5); }
+    }
+
+    .intro-credits {
+      font-size: clamp(11px, 3vw, 15px);
+      font-weight: 700;
+      letter-spacing: 3px;
+      color: rgba(255,255,255,0.55);
+      margin-top: 18px;
+      text-shadow: 0 0 12px rgba(255,255,255,0.2);
+      animation: fadeInCredits 0.8s ease-out 1s forwards;
+      opacity: 0;
+    }
+    @keyframes fadeInCredits {
+      0%   { opacity: 0; transform: translateY(10px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    .intro-skip {
+      position: absolute; bottom: 30px;
+      z-index: 20;
+      color: rgba(255,255,255,0.35);
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 2px;
+      cursor: pointer;
+      animation: fadeInCredits 1s ease-out 2s forwards;
+      opacity: 0;
+      transition: color 0.3s;
+      text-shadow: 0 0 8px rgba(255,255,255,0.1);
+    }
+    .intro-skip:active { color: #fff; }
+  </style>
+</head>
+<body>
+
+<div id="intro-container">
+  <canvas id="particles-canvas"></canvas>
+
+  <div class="intro-text-wrap">
+    <div class="intro-title">BATTLE<br>ROYALE 2026</div>
+    <div class="intro-subtitle">STYLE PRO</div>
+    <div class="intro-credits">🔥 HECHO POR SOYADRIANYT001 🔥</div>
+  </div>
+
+  <div class="intro-skip" id="skip-btn">TOCA PARA SALTAR ›</div>
+</div>
+
+<script>
+  // ===== PARTÍCULAS DE FONDO =====
+  const canvas = document.getElementById('particles-canvas');
+  const ctx = canvas.getContext('2d');
+  let w, h;
+  const particles = [];
+
+  function resize() {
+    w = canvas.width  = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  // Crear partículas
+  for (let i = 0; i < 70; i++) {
+    particles.push({
+      x: Math.random() * w,
+      y: Math.random() * h,
+      r: Math.random() * 2.2 + 0.6,
+      vx: (Math.random() - 0.5) * 0.7,
+      vy: (Math.random() - 0.5) * 0.7 - 0.3,
+      alpha: Math.random() * 0.7 + 0.3,
+      pulse: Math.random() * Math.PI * 2
+    });
+  }
+
+  // Líneas entre partículas cercanas
+  function drawLines(p1, p2, dist) {
+    if (dist < 90) {
+      ctx.beginPath();
+      ctx.moveTo(p1.x, p1.y);
+      ctx.lineTo(p2.x, p2.y);
+      ctx.strokeStyle = `rgba(255,150,0,${0.08 * (1 - dist/90)})`;
+      ctx.lineWidth = 0.5;
+      ctx.stroke();
+    }
+  }
+
+  function animateParticles() {
+    ctx.clearRect(0, 0, w, h);
+
+    for (let i = 0; i < particles.length; i++) {
+      const p = particles[i];
+      p.x += p.vx;
+      p.y += p.vy;
+
+      // Rebote suave
+      if (p.x < -10) p.x = w + 10;
+      if (p.x > w + 10) p.x = -10;
+      if (p.y < -10) p.y = h + 10;
+      if (p.y > h + 10) p.y = -10;
+
+      // Pulso
+      const pulse = Math.sin(p.pulse + Date.now() * 0.003) * 0.3 + 0.7;
+      const alpha = p.alpha * pulse;
+
+      // Brillo
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,180,0,${alpha})`;
+      ctx.fill();
+
+      // Brillo exterior
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r * 2.5, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,120,0,${alpha * 0.15})`;
+      ctx.fill();
+
+      // Líneas con partículas cercanas
+      for (let j = i + 1; j < particles.length; j++) {
+        const p2 = particles[j];
+        const dx = p.x - p2.x;
+        const dy = p.y - p2.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        drawLines(p, p2, dist);
+      }
+    }
+
+    requestAnimationFrame(animateParticles);
+  }
+  animateParticles();
+
+  // ===== DESTELLO INICIAL =====
+  const container = document.getElementById('intro-container');
+  const flash = document.createElement('div');
+  flash.style.cssText = 'position:absolute;inset:0;background:white;z-index:30;opacity:0;pointer-events:none;transition:opacity 0.3s;';
+  container.appendChild(flash);
+
+  // Flash al cargar
+  setTimeout(() => {
+    flash.style.opacity = '0.75';
+    setTimeout(() => { flash.style.opacity = '0'; }, 150);
+  }, 200);
+
+  // ===== SALTAR INTRO =====
+  let introDone = false;
+
+  function skipIntro() {
+    if (introDone) return;
+    introDone = true;
+    container.style.transition = 'opacity 0.6s ease, transform 0.5s ease';
+    container.style.opacity = '0';
+    container.style.transform = 'scale(1.08)';
+    setTimeout(() => {
+      // Redirigir al juego principal
+      window.location.href = 'index.html';
+      // O si usas otro nombre: window.location.href = 'juego.html';
+    }, 600);
+  }
+
+  // Auto-redirigir después de 4 segundos
+  setTimeout(skipIntro, 4000);
+
+  // Tocar para saltar
+  document.getElementById('skip-btn').addEventListener('click', skipIntro);
+  document.body.addEventListener('click', (e) => {
+    if (e.target === document.body || e.target === container || e.target.id === 'intro-container') {
+      skipIntro();
+    }
+  });
+</script>
+
+</body>
+</html>
