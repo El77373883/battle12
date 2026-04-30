@@ -975,59 +975,35 @@
     .pf-stat-card:active { background: rgba(255,200,0,0.1); border-color: rgba(255,200,0,0.3); }
     .pf-stat-val { font-size: 16px; font-weight: 900; color: #ffd700; line-height: 1; }
     .pf-stat-lbl { font-size: 8px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 3px; }
-/* ===== MEDALS ÁLBUM STYLE (FF) ===== */
-.pf-medals-section { position: relative; z-index: 10; padding: 0 0 8px; flex-shrink: 0; }
+/* ===== MEDALLAS DE PASE COMPACTAS ===== */
+.pf-medals-section { position: relative; z-index: 10; padding: 0 0 6px; flex-shrink: 0; }
 .pf-medals-title {
-  font-size: 9px; font-weight: 900; color: #ffd700;
+  font-size: 8px; font-weight: 900; color: #ffd700;
   letter-spacing: 2px; text-transform: uppercase;
-  margin-bottom: 8px; display: flex; align-items: center; gap: 6px;
+  margin-bottom: 6px; display: flex; align-items: center; gap: 6px;
 }
 .pf-medals-title::before {
   content: ''; display: inline-block;
-  width: 3px; height: 11px; background: #ffd700; border-radius: 2px;
+  width: 3px; height: 10px; background: #ffd700; border-radius: 2px;
 }
-.pf-medals-album-grid {
-  display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px;
+.pf-medals-row {
+  display: flex; gap: 8px; justify-content: flex-start; flex-wrap: wrap;
 }
-.pf-medal-item {
-  display: flex; flex-direction: column; align-items: center;
-  justify-content: center; gap: 3px;
-  border-radius: 8px; padding: 7px 3px 5px;
-  cursor: pointer; transition: all 0.12s; position: relative;
-  min-height: 54px; border: 1.5px solid rgba(255,255,255,0.08);
-  background: rgba(0,0,0,0.55); overflow: hidden;
+.pf-medal {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  cursor: pointer;
 }
-.pf-medal-item::before {
-  content: ''; position: absolute; inset: 0;
-  background: linear-gradient(180deg, rgba(255,255,255,0.04) 0%, transparent 60%);
-  pointer-events: none;
+.pf-medal svg {
+  width: 28px; height: 34px;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.5));
+  transition: transform 0.15s;
 }
-.pf-medal-item:active { transform: scale(0.90); }
-.pf-medal-item.bronze { border-color: rgba(200,120,60,0.6); background: linear-gradient(160deg,rgba(200,120,60,0.18),rgba(0,0,0,0.65)); }
-.pf-medal-item.silver { border-color: rgba(180,180,180,0.5); background: linear-gradient(160deg,rgba(180,180,180,0.14),rgba(0,0,0,0.65)); }
-.pf-medal-item.gold   { border-color: rgba(255,190,0,0.75); background: linear-gradient(160deg,rgba(255,190,0,0.22),rgba(0,0,0,0.65)); box-shadow: 0 0 8px rgba(255,190,0,0.2) inset; }
-.pf-medal-item.epic   { border-color: rgba(170,80,230,0.75); background: linear-gradient(160deg,rgba(170,80,230,0.22),rgba(0,0,0,0.65)); animation: pfEpicPulse 2s infinite; }
-.pf-medal-item.legend { border-color: rgba(255,80,20,0.85); background: linear-gradient(160deg,rgba(255,80,20,0.25),rgba(0,0,0,0.65)); animation: pfLegendPulse 1.6s infinite; }
-@keyframes pfEpicPulse  { 0%,100%{box-shadow:0 0 6px rgba(170,80,230,0.3)} 50%{box-shadow:0 0 16px rgba(180,80,255,0.65)} }
-@keyframes pfLegendPulse { 0%,100%{box-shadow:0 0 8px rgba(255,80,20,0.35)} 50%{box-shadow:0 0 20px rgba(255,100,0,0.75)} }
-.pf-medal-icon-wrap {
-  width: 30px; height: 30px; border-radius: 6px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 18px; line-height: 1;
-  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.7));
+.pf-medal:active svg { transform: scale(0.9); }
+.pf-medal-tooltip {
+  color: rgba(255,255,255,0.45);
+  font-size: 6px; font-weight: 600;
+  letter-spacing: 0.3px; text-align: center;
 }
-.pf-medal-item.bronze .pf-medal-icon-wrap { background: rgba(200,120,60,0.25); }
-.pf-medal-item.silver .pf-medal-icon-wrap { background: rgba(180,180,180,0.18); }
-.pf-medal-item.gold   .pf-medal-icon-wrap { background: rgba(255,190,0,0.25); }
-.pf-medal-item.epic   .pf-medal-icon-wrap { background: rgba(170,80,230,0.25); }
-.pf-medal-item.legend .pf-medal-icon-wrap { background: rgba(255,80,20,0.25); }
-.pf-medal-lv { font-size: 8px; font-weight: 800; letter-spacing: 0.3px; }
-.pf-medal-item.bronze .pf-medal-lv { color: #d4905a; }
-.pf-medal-item.silver .pf-medal-lv { color: #c8c8c8; }
-.pf-medal-item.gold   .pf-medal-lv { color: #ffd700; }
-.pf-medal-item.epic   .pf-medal-lv { color: #cc88ff; }
-.pf-medal-item.legend .pf-medal-lv { color: #ff8040; }
-
 /* ===== LÁPIZ EDITAR NOMBRE ===== */
 .pf-edit-btn {
   background: none; border: none; padding: 2px 4px;
