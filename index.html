@@ -1783,6 +1783,39 @@
     }
   </script>
 
+
+
+// ===== SIMPLEX NOISE GENERATOR =====
+// Implementación simple de Simplex Noise para terreno procedural
+const simplex = {
+  grad3: [[1,1,0],[-1,1,0],[1,-1,0],[-1,-1,0],[1,0,1],[-1,0,1],[1,0,-1],[-1,0,-1],[0,1,1],[0,-1,1],[0,1,-1],[0,-1,-1]],
+  p: [151,160,137,91,90,15,131,13,201,95,96,53,194,233,7,225,140,36,103,30,69,142,8,99,37,240,21,10,23,190,6,148,247,120,234,75,0,26,197,62,94,252,219,203,117,35,11,32,57,177,33,88,237,149,56,87,174,20,125,136,171,168,68,175,74,165,71,134,139,48,27,166,77,146,158,231,83,111,229,122,60,211,133,230,220,105,92,41,55,46,245,40,244,102,143,54,65,25,63,161,1,216,80,73,209,76,132,187,208,89,18,169,200,196,135,130,116,188,159,86,164,100,109,198,173,186,3,64,52,217,226,250,124,123,5,202,38,147,118,126,255,82,85,212,207,206,59,227,47,16,58,17,182,189,28,42,223,183,170,213,119,248,152,2,44,154,163,70,221,153,101,155,167,43,172,9,129,22,39,253,19,98,108,110,79,113,224,232,178,185,112,104,218,246,97,228,251,34,242,193,238,210,144,12,191,179,162,241,81,51,145,235,249,14,239,107,49,192,214,31,181,199,106,157,184,84,204,176,115,121,50,45,127,4,150,254,138,236,205,93,222,114,67,29,24,72,243,141,128,195,78,66,215,61,156,180],
+  perm: [],
+  seed: function() {
+    this.perm = new Uint8Array(512);
+    for(let i=0; i<512; i++) this.perm[i] = this.p[i & 255];
+  },
+  dot: function(g, x, y) { return g[0]*x + g[1]*y; },
+  noise: function(x, y) {
+    if(this.perm.length === 0) this.seed();
+    let X = Math.floor(x) & 255, Y = Math.floor(y) & 255;
+    x -= Math.floor(x); y -= Math.floor(y);
+    let u = x*x*x*(x*(x*6-15)+10), v = y*y*y*(y*(y*6-15)+10);
+    let gi00 = this.perm[X + this.perm[Y]] % 12;
+    let gi10 = this.perm[X+1 + this.perm[Y]] % 12;
+    let gi01 = this.perm[X + this.perm[Y+1]] % 12;
+    let gi11 = this.perm[X+1 + this.perm[Y+1]] % 12;
+    let n00 = this.dot(this.grad3[gi00], x, y);
+    let n10 = this.dot(this.grad3[gi10], x-1, y);
+    let n01 = this.dot(this.grad3[gi01], x, y-1);
+    let n11 = this.dot(this.grad3[gi11], x-1, y-1);
+    return this.lerp(this.lerp(n00, n10, u), this.lerp(n01, n11, u), v);
+  },
+  lerp: function(a,b,t) { return a + t*(b-a); }
+};
+simplex.seed();
+
+
   <script type="module">
     import * as THREE from 'three';
     import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -2036,8 +2069,9 @@
             bot.parachute.position.copy(bot.model.position);
             bot.parachute.position.y += 2.5;
           }
-          if (bot.model.position.y <= 1.0) {
-            bot.model.position.y = 1.0;
+          const botGroundY = getTerrainHeight(bot.model.position.x, bot.model.position.z);
+          if (bot.model.position.y <= botGroundY + 1.0) {
+            bot.model.position.y = botGroundY + 1.0;
             bot.falling = false;
             bot.onGround = true;
             if (bot.parachute) { scene.remove(bot.parachute); bot.parachute = null; }
@@ -2105,7 +2139,7 @@
             }
           }
         }
-        botPos.y = 1.0; // keep on ground
+        botPos.y = getTerrainHeight(botPos.x, botPos.z) + 1.0;
       }
     }
 
@@ -2924,30 +2958,202 @@ function createDetailedSakura(x, z) {
 
 
 
-// ===== WORLD =====
-    function createBeautifulWorld() {
-      // Suelo principal 1000x1000
-      const ground = new THREE.Mesh(
-        new THREE.CircleGeometry(1000, 128),
-        new THREE.MeshStandardMaterial({color:0x3d6b3d, roughness:0.85})
-      );
-      ground.rotation.x = -Math.PI/2;
-      ground.position.y = -0.1;
-      ground.receiveShadow = true;
-      scene.add(ground);
+// ===== WORLD WITH HEIGHTMAP =====
+    let terrainMesh = null;
+    let heightMap = [];
+    const TERRAIN_SEGMENTS = 180;
+    const TERRAIN_SIZE = 1000;
+
+    function getTerrainHeight(x, z) {
+      const hx = x / TERRAIN_SIZE * 2.5;
+      const hz = z / TERRAIN_SIZE * 2.5;
+      let h = 0;
+      h += simplex.noise(hx * 0.5, hz * 0.5) * 15;
+      h += simplex.noise(hx * 0.8, hz * 0.8) * 8;
+      h += simplex.noise(hx * 1.5, hz * 1.5) * 4;
+      h += simplex.noise(hx * 3.0, hz * 3.0) * 1.5;
+      return h;
+    }
+
+// ===== TIROLESAS =====
+      const ziplinePairs = [
+        [{x: -300, z: -200}, {x: -100, z: -100}],
+        [{x: 200, z: 300}, {x: 350, z: 200}],
+        [{x: -400, z: 100}, {x: -250, z: 180}],
+        [{x: 100, z: -350}, {x: 200, z: -250}],
+      ];
+      ziplinePairs.forEach(([start, end]) => {
+        const sy = getTerrainHeight(start.x, start.z) + 18;
+        const ey = getTerrainHeight(end.x, end.z) + 12;
+        const cableGeo = new THREE.BufferGeometry().setFromPoints([
+          new THREE.Vector3(start.x, sy, start.z),
+          new THREE.Vector3(end.x, ey, end.z)
+        ]);
+        const cable = new THREE.Line(cableGeo, new THREE.LineBasicMaterial({color: 0x888888, linewidth: 2}));
+        scene.add(cable);
+        const poleGeo = new THREE.CylinderGeometry(0.3, 0.3, sy - getTerrainHeight(start.x, start.z), 8);
+        const poleMat = new THREE.MeshStandardMaterial({color: 0x666666, metalness: 0.8});
+        const pole1 = new THREE.Mesh(poleGeo, poleMat);
+        pole1.position.set(start.x, (sy + getTerrainHeight(start.x, start.z)) / 2, start.z);
+        scene.add(pole1);
+        const pole2 = new THREE.Mesh(poleGeo.clone(), poleMat);
+        pole2.position.set(end.x, (ey + getTerrainHeight(end.x, end.z)) / 2, end.z);
+        scene.add(pole2);
+      });
       
-      // ===== GRANDES MONTAÑAS =====
+      
+      // ===== TORRE DE RADIO =====
+      const towerX = 100, towerZ = -80;
+      const towerBaseY = getTerrainHeight(towerX, towerZ);
+      const towerGroup = new THREE.Group();
+      const towerMat = new THREE.MeshStandardMaterial({color: 0x999999, metalness: 0.9, roughness: 0.2});
+      for (let i = 0; i < 10; i++) {
+        const segGeo = new THREE.CylinderGeometry(0.25 - i * 0.015, 0.3 - i * 0.015, 3.5, 6);
+        const seg = new THREE.Mesh(segGeo, towerMat);
+        seg.position.y = i * 3.5;
+        towerGroup.add(seg);
+      }
+      const lightSphere = new THREE.Mesh(new THREE.SphereGeometry(0.6, 8, 8),
+        new THREE.MeshBasicMaterial({color: 0xff0000}));
+      lightSphere.position.y = 35;
+      towerGroup.add(lightSphere);
+      const lightPoint = new THREE.PointLight(0xff0000, 3, 30);
+      lightPoint.position.y = 35;
+      towerGroup.add(lightPoint);
+      towerGroup.position.set(towerX, towerBaseY, towerZ);
+      scene.add(towerGroup);
+      
+      // ===== MOLINOS DE VIENTO =====
+      for (let m = 0; m < 2; m++) {
+        const mx = m === 0 ? -200 : 250;
+        const mz = m === 0 ? -100 : 200;
+        const my = getTerrainHeight(mx, mz);
+        const millGroup = new THREE.Group();
+        const millBody = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.8, 8, 8),
+          new THREE.MeshStandardMaterial({color: 0xDDDDDD, roughness: 0.5}));
+        millBody.position.y = 4;
+        millGroup.add(millBody);
+        const bladeGroup = new THREE.Group();
+        for (let b = 0; b < 3; b++) {
+          const blade = new THREE.Mesh(new THREE.BoxGeometry(4, 0.1, 0.4),
+            new THREE.MeshStandardMaterial({color: 0xEEEEEE, roughness: 0.3}));
+          blade.position.x = 2;
+          blade.rotation.y = (b / 3) * Math.PI * 2;
+          bladeGroup.add(blade);
+        }
+        bladeGroup.position.y = 8.5;
+        bladeGroup.userData = {spin: true};
+        millGroup.add(bladeGroup);
+        millGroup.position.set(mx, my, mz);
+        scene.add(millGroup);
+      }
+      
+      // ===== FARO =====
+      const lighthouseX = 50, lighthouseZ = 180;
+      const lighthouseY = getTerrainHeight(lighthouseX, lighthouseZ);
+      const lighthouse = new THREE.Group();
+      const lhBody = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.8, 14, 8),
+        new THREE.MeshStandardMaterial({color: 0xEEEEEE, roughness: 0.3}));
+      lhBody.position.y = 7;
+      lighthouse.add(lhBody);
+      for (let s = 0; s < 4; s++) {
+        const stripe = new THREE.Mesh(new THREE.CylinderGeometry(1.22, 1.82, 1.5, 8),
+          new THREE.MeshStandardMaterial({color: 0xCC0000, roughness: 0.4}));
+        stripe.position.y = 3.5 + s * 3.5;
+        lighthouse.add(stripe);
+      }
+      const topRoom = new THREE.Mesh(new THREE.CylinderGeometry(1.4, 1.2, 2, 8),
+        new THREE.MeshStandardMaterial({color: 0x333333, roughness: 0.2}));
+      topRoom.position.y = 14.5;
+      lighthouse.add(topRoom);
+      const lightBeam = new THREE.PointLight(0xFFFF00, 5, 50);
+      lightBeam.position.y = 15;
+      lighthouse.add(lightBeam);
+      lighthouse.position.set(lighthouseX, lighthouseY, lighthouseZ);
+      scene.add(lighthouse);
+      
+      // ===== PUENTE COLGANTE (corregido) =====
+      const bridgePoints = [
+        {x: -150, z: -50},
+        {x: 0, z: -20},
+        {x: 150, z: -50}
+      ];
+      for (let bi = 0; bi < bridgePoints.length - 1; bi++) {
+        const ba = bridgePoints[bi], bb = bridgePoints[bi + 1];
+        const bay = getTerrainHeight(ba.x, ba.z) + 6;
+        const bby = getTerrainHeight(bb.x, bb.z) + 6;
+        for (let p = 0; p < 12; p++) {
+          const t = p / 12;
+          const px = ba.x + (bb.x - ba.x) * t;
+          const pz = ba.z + (bb.z - ba.z) * t;
+          const py = bay + (bby - bay) * t - Math.sin(t * Math.PI) * 2;
+          const plank = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.1, 1.5),
+            new THREE.MeshStandardMaterial({color: 0x8B5E3C, roughness: 0.8}));
+          plank.position.set(px, py, pz);
+          plank.rotation.y = Math.atan2(bb.x - ba.x, bb.z - ba.z);
+          scene.add(plank);
+        }
+        const midP = {x:(ba.x+bb.x)/2, z:(ba.z+bb.z)/2};
+        const midY = getTerrainHeight(midP.x, midP.z);
+        const cableGeo3 = new THREE.BufferGeometry().setFromPoints([
+          new THREE.Vector3(ba.x, bay + 2, ba.z),
+          new THREE.Vector3(midP.x, midY + 4 + 2, midP.z),
+          new THREE.Vector3(bb.x, bby + 2, bb.z)
+        ]);
+        scene.add(new THREE.Line(cableGeo3, new THREE.LineBasicMaterial({color: 0x555555})));
+      }
+
+
+    function createBeautifulWorld() {
+      const terrainGeo = new THREE.PlaneGeometry(TERRAIN_SIZE, TERRAIN_SIZE, TERRAIN_SEGMENTS, TERRAIN_SEGMENTS);
+      terrainGeo.rotateX(-Math.PI / 2);
+      const positions = terrainGeo.attributes.position;
+      
+      for (let i = 0; i < positions.count; i++) {
+        const x = positions.getX(i);
+        const z = positions.getZ(i);
+        const h = getTerrainHeight(x, z);
+        positions.setY(i, h);
+        heightMap.push({x, z, h});
+      }
+      terrainGeo.computeVertexNormals();
+      
+      const terrainMat = new THREE.MeshStandardMaterial({
+        color: 0x3d6b3d,
+        roughness: 0.85,
+        flatShading: false,
+        vertexColors: true
+      });
+      
+      const colors = [];
+      for (let i = 0; i < positions.count; i++) {
+        const h = positions.getY(i);
+        if (h < 1) colors.push(0.2, 0.32, 0.2);
+        else if (h < 5) colors.push(0.24, 0.42, 0.18);
+        else if (h < 12) colors.push(0.28, 0.38, 0.22);
+        else if (h < 20) colors.push(0.35, 0.35, 0.25);
+        else colors.push(0.4, 0.38, 0.3);
+      }
+      terrainGeo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+      
+      terrainMesh = new THREE.Mesh(terrainGeo, terrainMat);
+      terrainMesh.receiveShadow = true;
+      scene.add(terrainMesh);
+      
+      // ===== GRANDES MONTAÑAS (ahora sobre el terreno ruidoso) =====
       for (let i = 0; i < 30; i++) {
         const angle = (i / 30) * Math.PI * 2 + Math.random() * 0.3;
         const distance = 80 + Math.random() * 750;
         const height = 30 + Math.random() * 120;
-        const mGroup = new THREE.Group();
+        const x = Math.cos(angle) * distance;
+        const z = Math.sin(angle) * distance;
+        const baseH = getTerrainHeight(x, z);
         
+        const mGroup = new THREE.Group();
         const bodyGeo = new THREE.ConeGeometry(15 + Math.random() * 35, height, 12);
         const bodyMat = new THREE.MeshStandardMaterial({
           color: new THREE.Color().setHSL(0.25 + Math.random() * 0.1, 0.3, 0.3 + Math.random() * 0.3),
-          roughness: 0.7,
-          flatShading: true
+          roughness: 0.7, flatShading: true
         });
         const body = new THREE.Mesh(bodyGeo, bodyMat);
         body.position.y = height / 2;
@@ -2974,329 +3180,293 @@ function createDetailedSakura(x, z) {
           mGroup.add(rock);
         }
         
-        const x = Math.cos(angle) * distance;
-        const z = Math.sin(angle) * distance;
-        mGroup.position.set(x, 0, z);
+        mGroup.position.set(x, baseH, z);
         scene.add(mGroup);
-        obstacles.push({position: new THREE.Vector3(x, 0, z), radius: 25, height: height});
+        obstacles.push({position: new THREE.Vector3(x, baseH, z), radius: 25, height: height});
       }
       
-      // ===== LAGOS CON AGUA ANIMADA =====
-      const waterLakes = []; // Para animar después
+      // ===== RÍOS EN EL TERRENO =====
+      for (let r = 0; r < 2; r++) {
+        const startAngle = r * Math.PI;
+        const riverPath = [];
+        const steps = 30;
+        for (let s = 0; s < steps; s++) {
+          const angle = startAngle + (s / steps) * Math.PI * 0.7 + (Math.random() - 0.5) * 0.4;
+          const dist = 50 + s * 28;
+          riverPath.push({x: Math.cos(angle) * dist, z: Math.sin(angle) * dist});
+        }
+        
+        for (const p of riverPath) {
+          for (let dx = -4; dx <= 4; dx += 0.5) {
+            for (let dz = -4; dz <= 4; dz += 0.5) {
+              const wx = p.x + dx;
+              const wz = p.z + dz;
+              const dist2 = dx*dx + dz*dz;
+              if (dist2 < 16) {
+                const depth = (1 - dist2 / 16) * 2.5;
+                for (let vi = 0; vi < positions.count; vi++) {
+                  const vx = positions.getX(vi);
+                  const vz = positions.getZ(vi);
+                  if (Math.abs(vx - wx) < 1 && Math.abs(vz - wz) < 1) {
+                    positions.setY(vi, positions.getY(vi) - depth);
+                  }
+                }
+              }
+            }
+          }
+        }
+        
+        // Puentes sobre el río
+        for (let b = 0; b < 3; b++) {
+          const idx = Math.floor(riverPath.length * (0.25 + b * 0.25));
+          const bp = riverPath[idx];
+          const bridgeY = getTerrainHeight(bp.x, bp.z) + 0.3;
+          const bridgeGroup = new THREE.Group();
+          const plankGeo = new THREE.BoxGeometry(12, 0.2, 0.8);
+          const plankMat = new THREE.MeshStandardMaterial({color: 0x8B5E3C, roughness: 0.8});
+          for (let p = 0; p < 14; p++) {
+            const plank = new THREE.Mesh(plankGeo, plankMat);
+            plank.position.set(-6.5 + p, 0, 0);
+            bridgeGroup.add(plank);
+          }
+          const railGeo = new THREE.CylinderGeometry(0.1, 0.1, 1.5, 6);
+          const railMat = new THREE.MeshStandardMaterial({color: 0x6B3E1C, roughness: 0.7});
+          for (let side = -1; side <= 1; side += 2) {
+            for (let p = 0; p < 5; p++) {
+              const rail = new THREE.Mesh(railGeo, railMat);
+              rail.position.set(-5 + p * 2.5, 0.9, side * 0.5);
+              bridgeGroup.add(rail);
+            }
+          }
+          bridgeGroup.position.set(bp.x, bridgeY, bp.z);
+          bridgeGroup.rotation.y = Math.random() * 0.3;
+          scene.add(bridgeGroup);
+        }
+      }
       
+      // ===== BARRANCO PROFUNDO =====
+      const canyonStart = {x: -350, z: -200};
+      const canyonEnd = {x: 300, z: 150};
+      for (let s = 0; s < 40; s++) {
+        const t = s / 40;
+        const cx = canyonStart.x + (canyonEnd.x - canyonStart.x) * t + (Math.sin(t * 5) * 15);
+        const cz = canyonStart.z + (canyonEnd.z - canyonStart.z) * t + (Math.cos(t * 5) * 15);
+        for (let dx = -8; dx <= 8; dx += 0.5) {
+          for (let dz = -8; dz <= 8; dz += 0.5) {
+            const wx = cx + dx, wz = cz + dz;
+            const dist2 = dx*dx + dz*dz;
+            if (dist2 < 64) {
+              const depth = (1 - dist2 / 64) * 10;
+              for (let vi = 0; vi < positions.count; vi++) {
+                if (Math.abs(positions.getX(vi) - wx) < 1 && Math.abs(positions.getZ(vi) - wz) < 1) {
+                  positions.setY(vi, positions.getY(vi) - depth);
+                }
+              }
+            }
+          }
+        }
+      }
+      
+      positions.needsUpdate = true;
+      terrainGeo.computeVertexNormals();
+      terrainGeo.computeBoundingSphere();
+      
+      // ===== LAGOS =====
+      const waterLakes = [];
       for (let l = 0; l < 8; l++) {
         const lAngle = Math.random() * Math.PI * 2;
         const lDist = 60 + Math.random() * 700;
         const lx = Math.cos(lAngle) * lDist;
         const lz = Math.sin(lAngle) * lDist;
         const lakeSize = 8 + Math.random() * 25;
+        const lakeY = getTerrainHeight(lx, lz) - 0.5;
         
-        // Agua con olas (PlaneGeometry para poder deformar)
         const waterGeo = new THREE.PlaneGeometry(lakeSize * 2, lakeSize * 2, 32, 32);
         const waterMat = new THREE.MeshStandardMaterial({
-          color: 0x115599,
-          roughness: 0.05,
-          metalness: 0.8,
-          transparent: true,
-          opacity: 0.88,
-          flatShading: false
+          color: 0x115599, roughness: 0.05, metalness: 0.8,
+          transparent: true, opacity: 0.88
         });
         const water = new THREE.Mesh(waterGeo, waterMat);
         water.rotation.x = -Math.PI / 2;
-        water.position.set(lx, 0.15, lz);
+        water.position.set(lx, lakeY, lz);
         water.userData.isWater = true;
         water.userData.waterSpeed = 0.5 + Math.random() * 1.5;
-        water.userData.originalY = 0.15;
+        water.userData.originalY = lakeY;
         scene.add(water);
         waterLakes.push(water);
         
-        // Capa 2 de agua (más clara, encima)
-        const waterGeo2 = new THREE.PlaneGeometry(lakeSize * 1.8, lakeSize * 1.8, 24, 24);
-        const waterMat2 = new THREE.MeshStandardMaterial({
-          color: 0x3399cc,
-          roughness: 0.02,
-          metalness: 0.9,
-          transparent: true,
-          opacity: 0.5,
-          flatShading: false
-        });
-        const water2 = new THREE.Mesh(waterGeo2, waterMat2);
+        const water2 = new THREE.Mesh(new THREE.PlaneGeometry(lakeSize * 1.8, lakeSize * 1.8, 24, 24),
+          new THREE.MeshStandardMaterial({color: 0x3399cc, roughness: 0.02, metalness: 0.9, transparent: true, opacity: 0.5}));
         water2.rotation.x = -Math.PI / 2;
-        water2.position.set(lx, 0.2, lz);
+        water2.position.set(lx, lakeY + 0.05, lz);
         water2.userData.isWater = true;
         water2.userData.waterSpeed = 0.7 + Math.random() * 1.3;
-        water2.userData.originalY = 0.2;
+        water2.userData.originalY = lakeY + 0.05;
         scene.add(water2);
         waterLakes.push(water2);
         
-        // Brillo del sol en el agua
-        const shineGeo = new THREE.PlaneGeometry(lakeSize * 0.5, lakeSize * 0.5, 8, 8);
-        const shineMat = new THREE.MeshBasicMaterial({
-          color: 0xffffff,
-          transparent: true,
-          opacity: 0.25,
-          side: THREE.DoubleSide
-        });
-        const shine = new THREE.Mesh(shineGeo, shineMat);
-        shine.rotation.x = -Math.PI / 2;
-        shine.position.set(lx + lakeSize * 0.3, 0.22, lz - lakeSize * 0.2);
-        shine.userData.isWater = true;
-        shine.userData.waterSpeed = 0.3;
-        shine.userData.originalY = 0.22;
-        scene.add(shine);
-        waterLakes.push(shine);
-        
-        // Orilla del lago
         const shoreGeo = new THREE.TorusGeometry(lakeSize, 1.5 + Math.random() * 2, 8, 32);
-        const shoreMat = new THREE.MeshStandardMaterial({
-          color: 0x8a7a5a,
-          roughness: 0.9,
-          flatShading: true
-        });
+        const shoreMat = new THREE.MeshStandardMaterial({color: 0x8a7a5a, roughness: 0.9, flatShading: true});
         const shore = new THREE.Mesh(shoreGeo, shoreMat);
         shore.rotation.x = -Math.PI / 2;
-        shore.position.set(lx, 0.08, lz);
+        shore.position.set(lx, lakeY + 0.08, lz);
         scene.add(shore);
-        
-        // Rocas alrededor
-        for (let lr = 0; lr < 6; lr++) {
-          const lrAngle = Math.random() * Math.PI * 2;
-          const lrDist = lakeSize + 2 + Math.random() * 5;
-          const rockGeo = new THREE.DodecahedronGeometry(0.5 + Math.random() * 2, 1);
-          const rockMat = new THREE.MeshStandardMaterial({
-            color: 0x777777,
-            roughness: 0.7,
-            flatShading: true
-          });
-          const rock = new THREE.Mesh(rockGeo, rockMat);
-          rock.position.set(
-            lx + Math.cos(lrAngle) * lrDist,
-            0.2 + Math.random() * 0.5,
-            lz + Math.sin(lrAngle) * lrDist
-          );
-          rock.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
-          scene.add(rock);
-        }
-        
-        // Guardar referencia global para animar
-        if (!window.waterLakes) window.waterLakes = [];
-        window.waterLakes = waterLakes;
       }
       
-      // ===== CÉSPED 3D DETALLADO =====
+      if (!window.waterLakes) window.waterLakes = [];
+      window.waterLakes = waterLakes;
+      
+      // ===== CÉSPED (adaptado al terreno) =====
       const grassColors = [
         new THREE.MeshStandardMaterial({color: 0x44bb2a, roughness: 0.5, side: THREE.DoubleSide}),
         new THREE.MeshStandardMaterial({color: 0x55cc33, roughness: 0.4, side: THREE.DoubleSide}),
         new THREE.MeshStandardMaterial({color: 0x33991a, roughness: 0.6, side: THREE.DoubleSide}),
         new THREE.MeshStandardMaterial({color: 0x66dd44, roughness: 0.45, side: THREE.DoubleSide}),
-        new THREE.MeshStandardMaterial({color: 0x2a8a15, roughness: 0.7, side: THREE.DoubleSide}),
-        new THREE.MeshStandardMaterial({color: 0x88ee55, roughness: 0.35, side: THREE.DoubleSide}),
       ];
       
-      for (let g = 0; g < 500; g++) {
+      for (let g = 0; g < 300; g++) {
         const gAngle = Math.random() * Math.PI * 2;
-        const gDist = 3 + Math.random() * 900;
+        const gDist = 3 + Math.random() * 850;
         const gx = Math.cos(gAngle) * gDist;
         const gz = Math.sin(gAngle) * gDist;
+        const gy = getTerrainHeight(gx, gz);
         
         const grassGroup = new THREE.Group();
         grassGroup.userData.isGrass = true;
-        
-        for (let j = 0; j < 20; j++) {
+        for (let j = 0; j < 15; j++) {
           const bladeMat = grassColors[Math.floor(Math.random() * grassColors.length)];
-          const bladeGeo = new THREE.PlaneGeometry(0.12 + Math.random() * 0.2, 0.5 + Math.random() * 1.8);
+          const bladeGeo = new THREE.PlaneGeometry(0.12 + Math.random() * 0.2, 0.5 + Math.random() * 1.5);
           const blade = new THREE.Mesh(bladeGeo, bladeMat);
-          
-          blade.position.set((Math.random() - 0.5) * 2.0, 0.2 + Math.random() * 0.5, (Math.random() - 0.5) * 2.0);
+          blade.position.set((Math.random() - 0.5) * 2.0, 0.2 + Math.random() * 0.4, (Math.random() - 0.5) * 2.0);
           blade.rotation.y = Math.random() * Math.PI * 2;
           blade.rotation.z = (Math.random() - 0.5) * 0.4;
           blade.rotation.x = (Math.random() - 0.5) * 0.4;
-          
           grassGroup.add(blade);
         }
-        grassGroup.position.set(gx, -0.05, gz);
+        grassGroup.position.set(gx, gy, gz);
         scene.add(grassGroup);
       }
       
-      // ===== ROCAS DECORATIVAS =====
-      const rockColors = [0x888888, 0x999999, 0x777777, 0xaaaaaa, 0x666666, 0x8a8a7a, 0x9a9a8a];
-      for (let r = 0; r < 120; r++) {
+      // ===== ROCAS =====
+      const rockColors = [0x888888, 0x999999, 0x777777, 0xaaaaaa, 0x666666];
+      for (let r = 0; r < 100; r++) {
         const rAngle = Math.random() * Math.PI * 2;
-        const rDist = 5 + Math.random() * 880;
+        const rDist = 5 + Math.random() * 850;
         const rx = Math.cos(rAngle) * rDist;
         const rz = Math.sin(rAngle) * rDist;
-        
-        const rockGroup = new THREE.Group();
-        rockGroup.userData.isRock = true;
+        const ry = getTerrainHeight(rx, rz);
         
         const rockMat = new THREE.MeshStandardMaterial({
           color: rockColors[Math.floor(Math.random() * rockColors.length)],
           roughness: 0.7, metalness: 0.1, flatShading: true
         });
-        
-        const mainRock = new THREE.Mesh(
-          new THREE.DodecahedronGeometry(0.3 + Math.random() * 1.5, 1), rockMat
-        );
-        mainRock.position.set(0, 0.1, 0);
+        const mainRock = new THREE.Mesh(new THREE.DodecahedronGeometry(0.3 + Math.random() * 1.5, 1), rockMat);
+        mainRock.position.set(rx, ry + 0.1, rz);
         mainRock.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
         mainRock.scale.set(0.6 + Math.random() * 1.8, 0.4 + Math.random() * 1.0, 0.6 + Math.random() * 1.8);
-        rockGroup.add(mainRock);
-        
-        for (let s = 0; s < 3 + Math.floor(Math.random() * 5); s++) {
-          const smallRock = new THREE.Mesh(
-            new THREE.DodecahedronGeometry(0.1 + Math.random() * 0.4, 0), rockMat.clone()
-          );
-          smallRock.position.set((Math.random() - 0.5) * 2.0, 0.05, (Math.random() - 0.5) * 2.0);
-          smallRock.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
-          rockGroup.add(smallRock);
-        }
-        
-        rockGroup.position.set(rx, 0, rz);
-        scene.add(rockGroup);
+        scene.add(mainRock);
       }
       
-      // ===== PINOS DETALLADOS =====
-      const trunkColors = [0x5c3a1e, 0x6b4520, 0x4a2a10, 0x7a5530, 0x3d2010];
-      const pineColors = [0x1a5c1a, 0x1e6b1e, 0x156315, 0x1a7a1a, 0x0d4d0d, 0x1f6f1f];
+      // ===== PINOS y SAKURAS (adaptados al terreno) =====
+      const trunkColors = [0x5c3a1e, 0x6b4520, 0x4a2a10, 0x7a5530];
+      const pineColors = [0x1a5c1a, 0x1e6b1e, 0x156315, 0x1a7a1a, 0x0d4d0d];
       
-      for (let i = 0; i < 300; i++) {
+      for (let i = 0; i < 200; i++) {
         const angle = Math.random() * Math.PI * 2;
         const distance = 15 + Math.random() * 850;
+        const x = Math.cos(angle) * distance;
+        const z = Math.sin(angle) * distance;
+        const baseY = getTerrainHeight(x, z);
+        
         const tGroup = new THREE.Group();
         tGroup.userData.isTree = true;
+        const tH = 8 + Math.random() * 20;
         
-        const tH = 8 + Math.random() * 25;
-        const tR = 0.4 + Math.random() * 0.8;
-        
-        const trunkMat = new THREE.MeshStandardMaterial({
-          color: trunkColors[Math.floor(Math.random() * trunkColors.length)], roughness: 0.9, flatShading: true
-        });
-        const trunk = new THREE.Mesh(
-          new THREE.CylinderGeometry(tR * 0.3, tR * 0.5, tH * 0.4, 8), trunkMat
-        );
+        const trunkMat = new THREE.MeshStandardMaterial({color: trunkColors[Math.floor(Math.random() * trunkColors.length)], roughness: 0.9, flatShading: true});
+        const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.35, tH * 0.4, 8), trunkMat);
         trunk.position.y = tH * 0.2;
         trunk.castShadow = true;
         tGroup.add(trunk);
         
-        const pineColor = pineColors[Math.floor(Math.random() * pineColors.length)];
-        const pineMat1 = new THREE.MeshStandardMaterial({color: pineColor, roughness: 0.7, flatShading: true});
-        const pineMat2 = new THREE.MeshStandardMaterial({
-          color: new THREE.Color(pineColor).offsetHSL(0.03, 0, 0.05), roughness: 0.7, flatShading: true
-        });
-        
         for (let layer = 0; layer < 4; layer++) {
-          const layerMat = layer % 2 === 0 ? pineMat1 : pineMat2;
-          const coneGeo = new THREE.ConeGeometry(tR * 3.5 - layer * 0.7 + Math.random() * 0.5, tH * 0.28, 8);
-          const cone = new THREE.Mesh(coneGeo, layerMat);
+          const pineColor = pineColors[Math.floor(Math.random() * pineColors.length)];
+          const cone = new THREE.Mesh(new THREE.ConeGeometry(2.5 - layer * 0.5, tH * 0.28, 8),
+            new THREE.MeshStandardMaterial({color: pineColor, roughness: 0.7, flatShading: true}));
           cone.position.y = tH * 0.35 + layer * tH * 0.15;
           cone.castShadow = true;
           tGroup.add(cone);
         }
         
-        const tipGeo = new THREE.ConeGeometry(tR * 0.5, tH * 0.18, 6);
-        const tip = new THREE.Mesh(tipGeo, pineMat2);
-        tip.position.y = tH * 0.35 + 4 * tH * 0.15 + tH * 0.08;
-        tip.castShadow = true;
-        tGroup.add(tip);
-        
-        const x = Math.cos(angle) * distance;
-        const z = Math.sin(angle) * distance;
-        tGroup.position.set(x, 0, z);
+        tGroup.position.set(x, baseY, z);
         tGroup.rotation.y = Math.random() * Math.PI * 2;
         scene.add(tGroup);
-        obstacles.push({position: new THREE.Vector3(x, 0, z), radius: 2.5, height: tH});
+        obstacles.push({position: new THREE.Vector3(x, baseY, z), radius: 2.5, height: tH});
       }
       
-      
-      
-      // ===== ÁRBOLES SAKURA (CEREZOS) =====
-      for (let i = 0; i < 50; i++) {
+      // ===== SAKURAS =====
+      for (let i = 0; i < 40; i++) {
         const sAngle = Math.random() * Math.PI * 2;
         const sDist = 100 + Math.random() * 800;
         const sx = Math.cos(sAngle) * sDist;
         const sz = Math.sin(sAngle) * sDist;
-        
+        const sy = getTerrainHeight(sx, sz);
         const sakura = createDetailedSakura(sx, sz);
-        sakura.userData.isTree = true;
+        sakura.position.y = sy;
         sakura.scale.set(1.5, 1.5, 1.5);
         scene.add(sakura);
-        obstacles.push({position: new THREE.Vector3(sx, 0, sz), radius: 2, height: 5});
+        obstacles.push({position: new THREE.Vector3(sx, sy, sz), radius: 2, height: 5});
       }
       
-      
-      // ===== CASAS DETALLADAS =====
+      // ===== CASAS =====
       const wallColors = [0xd4c5a9, 0xe8dcc8, 0xc8b89a, 0xbcad96, 0xd9cdb8];
       const roofColors = [0x7a3a1a, 0x9c4f1e, 0x5a2a10, 0x8b3a14, 0x6b2a0a];
       
-      for (let i = 0; i < 50; i++) {
+      for (let i = 0; i < 40; i++) {
         const angle = Math.random() * Math.PI * 2;
         const distance = 25 + Math.random() * 800;
+        const x = Math.cos(angle) * distance;
+        const z = Math.sin(angle) * distance;
+        const baseY = getTerrainHeight(x, z);
+        
         const hGroup = new THREE.Group();
         hGroup.userData.isHouse = true;
+        const wW = 6 + Math.random() * 5, wD = 6 + Math.random() * 5, wH = 5 + Math.random() * 4;
         
-        const wW = 7 + Math.random() * 6;
-        const wD = 7 + Math.random() * 6;
-        const wH = 6 + Math.random() * 5;
-        
-        const wallMat = new THREE.MeshStandardMaterial({
-          color: wallColors[i % wallColors.length], roughness: 0.75, flatShading: true
-        });
+        const wallMat = new THREE.MeshStandardMaterial({color: wallColors[i % wallColors.length], roughness: 0.75, flatShading: true});
         const walls = new THREE.Mesh(new THREE.BoxGeometry(wW, wH, wD), wallMat);
         walls.position.y = wH / 2;
         walls.castShadow = true;
         walls.receiveShadow = true;
         hGroup.add(walls);
         
-        const roofMat = new THREE.MeshStandardMaterial({
-          color: roofColors[i % roofColors.length], roughness: 0.6, flatShading: true
-        });
-        const roof = new THREE.Mesh(
-          new THREE.ConeGeometry(Math.max(wW, wD) * 0.78, wH * 0.55, 4), roofMat
-        );
+        const roof = new THREE.Mesh(new THREE.ConeGeometry(Math.max(wW, wD) * 0.78, wH * 0.55, 4),
+          new THREE.MeshStandardMaterial({color: roofColors[i % roofColors.length], roughness: 0.6, flatShading: true}));
         roof.position.y = wH + wH * 0.22;
         roof.rotation.y = Math.PI / 4;
         roof.castShadow = true;
         hGroup.add(roof);
         
-        const winMat = new THREE.MeshStandardMaterial({
-          color: 0x88ccff, roughness: 0.1, emissive: new THREE.Color(0x112233), flatShading: true
-        });
-        for (let w = 0; w < 2; w++) {
-          const win = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1.2, 0.1), winMat);
-          win.position.set(-wW * 0.2 + w * wW * 0.4, wH * 0.5, wD * 0.501);
-          hGroup.add(win);
-          const win2 = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1.2, 0.1), winMat);
-          win2.position.set(-wW * 0.2 + w * wW * 0.4, wH * 0.5, -wD * 0.501);
-          hGroup.add(win2);
-        }
-        
-        const doorMat = new THREE.MeshStandardMaterial({color: 0x4a2a0a, roughness: 0.8, flatShading: true});
-        const door = new THREE.Mesh(new THREE.BoxGeometry(1.4, 2.5, 0.15), doorMat);
+        const door = new THREE.Mesh(new THREE.BoxGeometry(1.4, 2.5, 0.15),
+          new THREE.MeshStandardMaterial({color: 0x4a2a0a, roughness: 0.8}));
         door.position.set(0, 1.25, wD * 0.501);
         hGroup.add(door);
         
-        const foundMat = new THREE.MeshStandardMaterial({color: 0x888888, roughness: 0.9, flatShading: true});
-        const found = new THREE.Mesh(new THREE.BoxGeometry(wW + 0.6, 0.4, wD + 0.6), foundMat);
-        found.position.y = 0.2;
-        hGroup.add(found);
-        
-        const x = Math.cos(angle) * distance;
-        const z = Math.sin(angle) * distance;
-        hGroup.position.set(x, 0, z);
+        hGroup.position.set(x, baseY, z);
         hGroup.rotation.y = Math.random() * Math.PI * 2;
         scene.add(hGroup);
-        obstacles.push({position: new THREE.Vector3(x, 0, z), radius: 6, height: wH + 4});
+        obstacles.push({position: new THREE.Vector3(x, baseY, z), radius: 6, height: wH + 4});
       }
     }
 
     function checkCollision(newPos) {
       for (const obstacle of obstacles) {
-        const dx=newPos.x-obstacle.position.x, dz=newPos.z-obstacle.position.z;
-        const dist=Math.sqrt(dx*dx+dz*dz);
-        if (dist < obstacle.radius && newPos.y < obstacle.height) {
-          const angle=Math.atan2(dz,dx);
-          newPos.x=obstacle.position.x+Math.cos(angle)*(obstacle.radius+0.5);
-          newPos.z=obstacle.position.z+Math.sin(angle)*(obstacle.radius+0.5);
+        const dx = newPos.x - obstacle.position.x;
+        const dz = newPos.z - obstacle.position.z;
+        const dist = Math.sqrt(dx * dx + dz * dz);
+        if (dist < obstacle.radius && newPos.y < obstacle.height + obstacle.position.y) {
+          const angle = Math.atan2(dz, dx);
+          newPos.x = obstacle.position.x + Math.cos(angle) * (obstacle.radius + 0.5);
+          newPos.z = obstacle.position.z + Math.sin(angle) * (obstacle.radius + 0.5);
           return true;
         }
       }
@@ -3570,6 +3740,16 @@ function createDetailedSakura(x, z) {
     function updateGame(delta) {
       // ---- LOBBY ----
       if (currentState === State.LOBBY && lobbyModel) {
+        // Animar molinos de viento
+        scene.children.forEach(child => {
+          if (child.isGroup && child.children.length > 1) {
+            child.children.forEach(sub => {
+              if (sub.userData && sub.userData.spin) {
+                sub.rotation.z += delta * 0.8;
+              }
+            });
+          }
+        });
         lobbyTime += delta;
         lobbyModel.position.y = 0.3 + Math.sin(lobbyTime * 1.5) * 0.06;
         lobbyModel.rotation.y += delta * 0.35;
@@ -3701,8 +3881,9 @@ camera.lookAt(0, 2, 0);
               localPlayer.position.x += dir.x * 7 * delta;
               localPlayer.position.z += dir.z * 7 * delta;
             }
-            if (localPlayer.position.y <= 1.0) {
-              localPlayer.position.y = 1.0;
+    const groundY = getTerrainHeight(localPlayer.position.x, localPlayer.position.z);
+            if (localPlayer.position.y <= groundY + 1.0) {
+               localPlayer.position.y = groundY + 1.0;
               localPlayer.onGround = true;
               localPlayer.parachuteOpen = false;
               localPlayer.velocity.set(0,0,0);
@@ -3717,7 +3898,9 @@ camera.lookAt(0, 2, 0);
           localPlayer.position.y += localPlayer.velocity.y * delta;
 
           // Landing check
-          if (localPlayer.position.y <= 1.0 && !localPlayer.parachuteOpen) {
+          const groundY = getTerrainHeight(localPlayer.position.x, localPlayer.position.z);
+          if (localPlayer.position.y <= groundY + 1.0 && !localPlayer.parachuteOpen) {
+            localPlayer.position.y = groundY + 1.0;
             localPlayer.position.y = 1.0;
             if (!localPlayer.onGround) createDust(localPlayer.position);
             localPlayer.onGround = true;
