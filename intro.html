@@ -23,7 +23,6 @@
     }
     canvas { position: absolute; inset: 0; z-index: 1; }
 
-    /* Texto principal */
     .intro-text-wrap {
       position: relative; z-index: 10;
       text-align: center;
@@ -82,6 +81,30 @@
       100% { opacity: 1; transform: translateY(0); }
     }
 
+    /* Barra de carga */
+    .load-bar-wrap {
+      margin-top: 22px;
+      width: 220px;
+      height: 4px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 2px;
+      overflow: hidden;
+      opacity: 0;
+      animation: fadeInCredits 0.8s ease-out 1.4s forwards;
+    }
+    .load-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #ff9500, #ffd700, #ff5500);
+      border-radius: 2px;
+      box-shadow: 0 0 12px rgba(255,150,0,0.7);
+      animation: loadBar 7.5s ease-in-out 0.5s forwards;
+    }
+    @keyframes loadBar {
+      0%   { width: 0%; }
+      100% { width: 100%; }
+    }
+
     .intro-skip {
       position: absolute; bottom: 30px;
       z-index: 20;
@@ -106,6 +129,10 @@
     <div class="intro-title">BATTLE<br>ROYALE 2026</div>
     <div class="intro-subtitle">STYLE PRO</div>
     <div class="intro-credits">🔥 HECHO POR SOYADRIANYT001 🔥</div>
+    <!-- Barra de carga -->
+    <div class="load-bar-wrap">
+      <div class="load-bar-fill"></div>
+    </div>
   </div>
 
   <div class="intro-skip" id="skip-btn">TOCA PARA SALTAR ›</div>
@@ -158,29 +185,24 @@
       p.x += p.vx;
       p.y += p.vy;
 
-      // Rebote suave
       if (p.x < -10) p.x = w + 10;
       if (p.x > w + 10) p.x = -10;
       if (p.y < -10) p.y = h + 10;
       if (p.y > h + 10) p.y = -10;
 
-      // Pulso
       const pulse = Math.sin(p.pulse + Date.now() * 0.003) * 0.3 + 0.7;
       const alpha = p.alpha * pulse;
 
-      // Brillo
       ctx.beginPath();
       ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(255,180,0,${alpha})`;
       ctx.fill();
 
-      // Brillo exterior
       ctx.beginPath();
       ctx.arc(p.x, p.y, p.r * 2.5, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(255,120,0,${alpha * 0.15})`;
       ctx.fill();
 
-      // Líneas con partículas cercanas
       for (let j = i + 1; j < particles.length; j++) {
         const p2 = particles[j];
         const dx = p.x - p2.x;
@@ -200,7 +222,6 @@
   flash.style.cssText = 'position:absolute;inset:0;background:white;z-index:30;opacity:0;pointer-events:none;transition:opacity 0.3s;';
   container.appendChild(flash);
 
-  // Flash al cargar
   setTimeout(() => {
     flash.style.opacity = '0.75';
     setTimeout(() => { flash.style.opacity = '0'; }, 150);
@@ -216,14 +237,12 @@
     container.style.opacity = '0';
     container.style.transform = 'scale(1.08)';
     setTimeout(() => {
-      // Redirigir al juego principal
-      window.location.href = 'index.html';
-      // O si usas otro nombre: window.location.href = 'juego.html';
+      window.location.href = 'login.html';
     }, 600);
   }
 
-  // Auto-redirigir después de 4 segundos
-  setTimeout(skipIntro, 4000);
+  // Auto-redirigir después de 8 segundos
+  setTimeout(skipIntro, 8000);
 
   // Tocar para saltar
   document.getElementById('skip-btn').addEventListener('click', skipIntro);
