@@ -1477,7 +1477,7 @@
 
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x87CEEB);
-    scene.fog = new THREE.FogExp2(0x87CEEB, 0.00001);
+    scene.fog = new THREE.FogExp2(0x87CEEB, 0.000003);
 
     const camera = new THREE.PerspectiveCamera(65, window.innerWidth/window.innerHeight, 0.5, 500);
     camera.position.set(0, 4, 7);
@@ -2885,10 +2885,10 @@
     }
 
     function updateLobbyCamera() {
-      const isLandscape = window.innerWidth > window.innerHeight;
-      if (isLandscape) { camera.position.set(0,3,6); camera.lookAt(0,2,0); }
-      else { camera.position.set(0,3.5,5.5); camera.lookAt(0,2,0); }
-    }
+  const isLandscape = window.innerWidth > window.innerHeight;
+  if (isLandscape) { camera.position.set(0, 30, 50); camera.lookAt(0, 0, 0); }
+  else { camera.position.set(0, 40, 45); camera.lookAt(0, 0, 0); }
+}
 
     function setupLobbyFallback() {
       if (lobbyModel) scene.remove(lobbyModel);
@@ -3132,16 +3132,16 @@
             });
           }
         });
-        const camX = Math.sin(lobbyTime * 0.35) * 1.8;
-        const camZ = 5.5 + Math.cos(lobbyTime * 0.35) * 1.2;
-        camera.position.lerp(new THREE.Vector3(camX, 3.5, camZ), 0.03);
-        camera.lookAt(0, 2.2, 0);
+        const camX = Math.sin(lobbyTime * 0.15) * 40;
+        const camZ = 50 + Math.cos(lobbyTime * 0.15) * 25;
+        camera.position.lerp(new THREE.Vector3(camX, 35, camZ), 0.015);
+        camera.lookAt(0, 0, 0);
         // Nubes animadas
         if (typeof clouds !== 'undefined') {
           for (const c of clouds) {
             c.position.x += c.userData.spd * delta;
-            if (c.position.x > 160) c.position.x = -160;
-            if (c.position.x < -160) c.position.x = 160;
+            if (c.position.x > 800) c.position.x = -800;
+            if (c.position.x < -800) c.position.x = 800;
           }
         }
       }
