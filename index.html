@@ -2883,16 +2883,18 @@ function createDetailedSakura(x, z) {
       
       
       
-      // ===== ÁRBOLES SAKURA (PRUEBA - FRENTE A LA CÁMARA) =====
-      for (let i = 0; i < 5; i++) {
-        const sx = -20 + i * 10;
-        const sz = -30;  // ⬅️ ANTES ERA 40, AHORA -30 (frente a la cámara)
+      // ===== ÁRBOLES SAKURA (CEREZOS) =====
+      for (let i = 0; i < 50; i++) {
+        const sAngle = Math.random() * Math.PI * 2;
+        const sDist = 50 + Math.random() * 800;
+        const sx = Math.cos(sAngle) * sDist;
+        const sz = Math.sin(sAngle) * sDist;
         
         const sakura = createDetailedSakura(sx, sz);
         sakura.userData.isTree = true;
-        sakura.scale.set(2, 2, 2);  // ⬅️ Más pequeño
+        sakura.scale.set(1.5, 1.5, 1.5);
         scene.add(sakura);
-        obstacles.push({position: new THREE.Vector3(sx, 0, sz), radius: 3, height: 8});
+        obstacles.push({position: new THREE.Vector3(sx, 0, sz), radius: 2, height: 5});
       }
       
       
