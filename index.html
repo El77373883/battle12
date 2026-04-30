@@ -1094,79 +1094,76 @@
     }
 
 
-/* ===== PASE SAKURA OVERLAY ===== */
-#pase-sakura-overlay {
-  position: fixed; inset: 0; z-index: 350;
-  background: rgba(0,0,0,0.95); display: none;
-  flex-direction: column; overflow-y: auto;
-  color: white;
-}
-#pase-sakura-overlay.active { display: flex; }
-.pase-sakura-bg {
-  position: fixed; inset: 0;
-  background: url('https://archive.org/download/img-7185_202604/IMG_7185.png') center/cover no-repeat;
-  z-index: 0;
-  opacity: 0.3;
-}
-.pase-sakura-bg::after {
-  content: '';
-  position: absolute; inset: 0;
-  background: linear-gradient(180deg, rgba(26,10,46,0.85) 0%, rgba(13,5,24,0.9) 50%, rgba(26,10,46,0.85) 100%);
-}
-.pase-header {
-  position: relative; z-index: 5;
-  display: flex; align-items: center; justify-content: space-between;
-  padding: max(14px, env(safe-area-inset-top)) 16px 10px;
-  background: rgba(0,0,0,0.5);
-}
-.pase-header h2 { 
-  color: #ff69b4; font-size: 18px; font-weight: 900;
-  letter-spacing: 2px; text-shadow: 0 0 20px rgba(255,105,180,0.6);
-}
-.pase-close-btn {
-  width: 36px; height: 36px; background: rgba(255,255,255,0.1);
-  border: 1px solid rgba(255,255,255,0.2); border-radius: 50%;
-  color: white; font-size: 16px; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-}
-.pase-close-btn:active { background: rgba(255,60,60,0.5); }
+<!-- PASE SAKURA OVERLAY -->
+<div id="pase-sakura-overlay">
+  <div class="pase-sakura-bg"></div>
+  <div class="pase-header">
+    <h2>🌸 PASE SAKURA S1</h2>
+    <button class="pase-close-btn" id="close-pase-sakura">✕</button>
+  </div>
 
-/* Banner Sakura con IMAGEN */
-.pase-banner {
-  position: relative; z-index: 5;
-  margin: 10px 14px; padding: 0;
-  border-radius: 16px; overflow: hidden;
-  min-height: 200px;
-  display: flex; align-items: center; justify-content: center;
-  border: 2px solid rgba(255,105,180,0.5);
-}
-.pase-banner-img {
-  width: 100%; height: 200px; display: block;
-  object-fit: cover;
-}
-.pase-banner-overlay {
-  position: absolute; inset: 0;
-  background: linear-gradient(180deg, 
-    rgba(26,10,46,0.5) 0%, 
-    rgba(13,5,24,0.3) 50%, 
-    rgba(26,10,46,0.75) 100%);
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  text-align: center; padding: 20px;
-}
-.pase-banner-icon { font-size: 40px; margin-bottom: 4px; animation: sakuraFloat 3s ease-in-out infinite; }
-@keyframes sakuraFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
-.pase-banner h3 { color: #ff69b4; font-size: 20px; font-weight: 900; letter-spacing: 2px; text-shadow: 0 0 20px rgba(255,105,180,0.8); }
-.pase-banner p { color: rgba(255,255,255,0.78); font-size: 10px; margin-top: 2px; }
+  <!-- BANNER CON IMAGEN -->
+  <div class="pase-banner">
+    <img src="https://archive.org/download/img-7203_202604/IMG_7203.png" alt="Sakura Banner" class="pase-banner-img" onerror="this.style.display='none'">
+    <div class="pase-banner-overlay">
+      <div class="pase-banner-icon">🌸</div>
+      <h3>SAKURA SEASON 1</h3>
+      <p>¡Colecciona medallas y desbloquea recompensas exclusivas!</p>
+    </div>
+  </div>
 
-/* Contador de medallas */
-.pase-medals-counter {
-  position: relative; z-index: 5;
-  display: flex; align-items: center; justify-content: center; gap: 10px;
-  margin: 0 14px 10px; padding: 12px;
-  background: rgba(255,105,180,0.1); border: 1px solid rgba(255,105,180,0.3);
-  border-radius: 12px;
-}
+  <!-- SECCIÓN DE COMPRA (visible si NO tiene pase) -->
+  <div id="pase-compra-section">
+    <div class="pase-medals-counter">
+      <div class="pase-medal-icon-display">🏅</div>
+      <div class="pase-medal-info">
+        <div class="pase-medal-count" id="total-medals-count">0 / 200</div>
+        <div class="pase-medal-label">Medallas Sakura coleccionadas</div>
+      </div>
+    </div>
+
+    <div class="pase-options">
+      <div class="pase-option-card" id="pase-basico" onclick="selectPase('basico')">
+        <div class="pase-option-title">🌸 PASE BÁSICO</div>
+        <div class="pase-option-price">600 <span>💎</span></div>
+        <div style="color:rgba(255,255,255,0.6);font-size:9px;">+5 Medallas Sakura</div>
+        <div class="pase-option-badge">INICIAL</div>
+      </div>
+      <div class="pase-option-card elite" id="pase-elite" onclick="selectPase('elite')">
+        <div class="pase-option-title">👑 PASE ÉLITE</div>
+        <div class="pase-option-price">1200 <span>💎</span></div>
+        <div style="color:rgba(255,255,255,0.6);font-size:9px;">+150 Medallas Sakura</div>
+        <div class="pase-option-badge">+100 REBAJADO</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECCIÓN DE RECOMPENSAS (visible SOLO si tiene pase activo) -->
+  <div id="pase-recompensas-section" style="display:none;">
+    <div class="pase-medals-counter">
+      <div class="pase-medal-icon-display">🏅</div>
+      <div class="pase-medal-info">
+        <div class="pase-medal-count" id="total-medals-count-2">0 / 200</div>
+        <div class="pase-medal-label">Medallas Sakura coleccionadas</div>
+      </div>
+    </div>
+
+    <div class="pase-progress-section">
+      <div class="pase-progress-header">
+        <div class="pase-progress-title">Progreso del Pase</div>
+        <div class="pase-progress-level" id="pase-level-display">Nivel 1/50</div>
+      </div>
+      <div class="pase-progress-bar-bg">
+        <div class="pase-progress-bar-fill" id="pase-progress-bar" style="width:2%"></div>
+      </div>
+    </div>
+
+    <div class="pase-rewards-section">
+      <div class="pase-rewards-title">🎁 Recompensas del Pase</div>
+      <div class="pase-rewards-grid" id="pase-rewards-grid"></div>
+    </div>
+  </div>
+</div>
 .pase-medal-icon-display { font-size: 36px; }
 .pase-medal-info { text-align: left; }
 .pase-medal-count { color: #ffd700; font-size: 20px; font-weight: 900; }
