@@ -1477,7 +1477,7 @@
 
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x87CEEB);
-    scene.fog = new THREE.FogExp2(0x87CEEB, 0.0003);
+    scene.fog = new THREE.FogExp2(0x87CEEB, 0.00001);
 
     const camera = new THREE.PerspectiveCamera(65, window.innerWidth/window.innerHeight, 0.5, 500);
     camera.position.set(0, 4, 7);
@@ -1735,9 +1735,9 @@
             const a = Math.random() * Math.PI * 2;
             const d = 8 + Math.random() * 12;
             bot.patrolTarget.set(
-              Math.max(-90, Math.min(90, botPos.x + Math.cos(a) * d)),
+              Math.max(-950, Math.min(950, botPos.x + Math.cos(a) * d)),
               1.0,
-              Math.max(-90, Math.min(90, botPos.z + Math.sin(a) * d))
+              Math.max(-950, Math.min(950, botPos.z + Math.sin(a) * d))
             );
             bot.patrolTimer = 3 + Math.random() * 4;
           }
@@ -3308,8 +3308,8 @@
         }
         // player on minimap
         if (playerModel && currentState === State.PLAYING) {
-          const px=55+(localPlayer.position.x/120)*48;
-          const py=55+(localPlayer.position.z/120)*48;
+          const px=55+(localPlayer.position.x/1000)*48;
+          const py=55+(localPlayer.position.z/1000)*48;
           ctxMinimap.fillStyle='#FFD700'; ctxMinimap.beginPath(); ctxMinimap.arc(px,py,5,0,Math.PI*2); ctxMinimap.fill();
           // direction arrow
           ctxMinimap.strokeStyle='#FFD700'; ctxMinimap.lineWidth=2;
