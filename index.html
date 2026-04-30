@@ -938,8 +938,8 @@
       display: flex; align-items: center; gap: 12px;
       padding: 10px 16px 0; flex-shrink: 0;
     }
-    .pf-avatar {
-      width: 52px; height: 52px; border-radius: 50%;
+.pf-avatar {
+  width: 58px; height: 58px; border-radius: 10px;
       background: linear-gradient(135deg, #ff6b35, #f7c948);
       border: 2px solid #ffd700;
       display: flex; align-items: center; justify-content: center;
@@ -974,23 +974,105 @@
     .pf-stat-card:active { background: rgba(255,200,0,0.1); border-color: rgba(255,200,0,0.3); }
     .pf-stat-val { font-size: 16px; font-weight: 900; color: #ffd700; line-height: 1; }
     .pf-stat-lbl { font-size: 8px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 3px; }
-    .pf-medals-section { position: relative; z-index: 10; padding: 10px 0 max(20px, env(safe-area-inset-bottom)); flex-shrink: 0; }
-    .pf-medals-title { font-size: 9px; font-weight: 800; color: rgba(255,200,0,0.7); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; }
-    .pf-medals-row { display: flex; gap: 10px; align-items: center; }
-    .pf-medal { width: 44px; height: 52px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; position: relative; flex-shrink: 0; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5)); }
-    .pf-medal:active { transform: scale(1.2); }
-    .pf-medal svg { width: 44px; height: 52px; }
-    .pf-medal.bronze  { filter: drop-shadow(0 0 6px rgba(180,100,50,0.7)); }
-    .pf-medal.silver  { filter: drop-shadow(0 0 6px rgba(200,200,200,0.6)); }
-    .pf-medal.gold    { filter: drop-shadow(0 0 10px rgba(255,220,0,0.8)); }
-    .pf-medal.epic    { filter: drop-shadow(0 0 12px rgba(160,80,200,0.9)); animation: epicGlow 2s infinite; }
-    .pf-medal.legend  { filter: drop-shadow(0 0 14px rgba(255,80,0,1)); animation: legendGlow 1.5s infinite; }
-    @keyframes epicGlow { 0%,100%{filter:drop-shadow(0 0 10px rgba(160,80,200,0.8))} 50%{filter:drop-shadow(0 0 22px rgba(180,80,255,1))} }
-    @keyframes legendGlow { 0%,100%{filter:drop-shadow(0 0 12px rgba(255,80,0,0.9))} 50%{filter:drop-shadow(0 0 26px rgba(255,120,0,1))} }
-    @keyframes epicGlow { 0%,100%{box-shadow:0 0 18px rgba(160,80,200,0.7)} 50%{box-shadow:0 0 32px rgba(160,80,200,1)} }
-    @keyframes legendGlow { 0%,100%{box-shadow:0 0 22px rgba(255,80,0,0.8)} 50%{box-shadow:0 0 40px rgba(255,80,0,1)} }
-    .pf-medal-tooltip { position:absolute; top:-32px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.9); color:white; padding:3px 8px; border-radius:5px; font-size:9px; white-space:nowrap; opacity:0; pointer-events:none; transition:opacity 0.2s; }
-    .pf-medal:hover .pf-medal-tooltip { opacity: 1; }
+/* ===== MEDALS ÁLBUM STYLE (FF) ===== */
+.pf-medals-section { position: relative; z-index: 10; padding: 0 0 8px; flex-shrink: 0; }
+.pf-medals-title {
+  font-size: 9px; font-weight: 900; color: #ffd700;
+  letter-spacing: 2px; text-transform: uppercase;
+  margin-bottom: 8px; display: flex; align-items: center; gap: 6px;
+}
+.pf-medals-title::before {
+  content: ''; display: inline-block;
+  width: 3px; height: 11px; background: #ffd700; border-radius: 2px;
+}
+.pf-medals-album-grid {
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px;
+}
+.pf-medal-item {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 3px;
+  border-radius: 8px; padding: 7px 3px 5px;
+  cursor: pointer; transition: all 0.12s; position: relative;
+  min-height: 54px; border: 1.5px solid rgba(255,255,255,0.08);
+  background: rgba(0,0,0,0.55); overflow: hidden;
+}
+.pf-medal-item::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.04) 0%, transparent 60%);
+  pointer-events: none;
+}
+.pf-medal-item:active { transform: scale(0.90); }
+.pf-medal-item.bronze { border-color: rgba(200,120,60,0.6); background: linear-gradient(160deg,rgba(200,120,60,0.18),rgba(0,0,0,0.65)); }
+.pf-medal-item.silver { border-color: rgba(180,180,180,0.5); background: linear-gradient(160deg,rgba(180,180,180,0.14),rgba(0,0,0,0.65)); }
+.pf-medal-item.gold   { border-color: rgba(255,190,0,0.75); background: linear-gradient(160deg,rgba(255,190,0,0.22),rgba(0,0,0,0.65)); box-shadow: 0 0 8px rgba(255,190,0,0.2) inset; }
+.pf-medal-item.epic   { border-color: rgba(170,80,230,0.75); background: linear-gradient(160deg,rgba(170,80,230,0.22),rgba(0,0,0,0.65)); animation: pfEpicPulse 2s infinite; }
+.pf-medal-item.legend { border-color: rgba(255,80,20,0.85); background: linear-gradient(160deg,rgba(255,80,20,0.25),rgba(0,0,0,0.65)); animation: pfLegendPulse 1.6s infinite; }
+@keyframes pfEpicPulse  { 0%,100%{box-shadow:0 0 6px rgba(170,80,230,0.3)} 50%{box-shadow:0 0 16px rgba(180,80,255,0.65)} }
+@keyframes pfLegendPulse { 0%,100%{box-shadow:0 0 8px rgba(255,80,20,0.35)} 50%{box-shadow:0 0 20px rgba(255,100,0,0.75)} }
+.pf-medal-icon-wrap {
+  width: 30px; height: 30px; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; line-height: 1;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.7));
+}
+.pf-medal-item.bronze .pf-medal-icon-wrap { background: rgba(200,120,60,0.25); }
+.pf-medal-item.silver .pf-medal-icon-wrap { background: rgba(180,180,180,0.18); }
+.pf-medal-item.gold   .pf-medal-icon-wrap { background: rgba(255,190,0,0.25); }
+.pf-medal-item.epic   .pf-medal-icon-wrap { background: rgba(170,80,230,0.25); }
+.pf-medal-item.legend .pf-medal-icon-wrap { background: rgba(255,80,20,0.25); }
+.pf-medal-lv { font-size: 8px; font-weight: 800; letter-spacing: 0.3px; }
+.pf-medal-item.bronze .pf-medal-lv { color: #d4905a; }
+.pf-medal-item.silver .pf-medal-lv { color: #c8c8c8; }
+.pf-medal-item.gold   .pf-medal-lv { color: #ffd700; }
+.pf-medal-item.epic   .pf-medal-lv { color: #cc88ff; }
+.pf-medal-item.legend .pf-medal-lv { color: #ff8040; }
+
+/* ===== LÁPIZ EDITAR NOMBRE ===== */
+.pf-edit-btn {
+  background: none; border: none; padding: 2px 4px;
+  cursor: pointer; opacity: 0.55; transition: opacity 0.2s;
+  display: inline-flex; align-items: center; vertical-align: middle; margin-left: 4px;
+}
+.pf-edit-btn:active { opacity: 1; }
+.pf-edit-btn svg { width: 13px; height: 13px; }
+
+/* ===== SAKURA SECTION NUEVA ===== */
+.pf-sakura-row {
+  position: relative; z-index: 10; margin-top: 8px;
+  background: linear-gradient(135deg,rgba(255,105,180,0.09),rgba(100,0,50,0.18));
+  border: 1px solid rgba(255,105,180,0.32); border-radius: 12px;
+  padding: 9px 12px; display: flex; align-items: center; gap: 10px;
+  cursor: pointer; transition: background 0.2s; user-select: none; -webkit-user-select: none;
+}
+.pf-sakura-row:active { background: rgba(255,105,180,0.18); }
+.pf-sakura-flower {
+  font-size: 26px; flex-shrink: 0;
+  animation: sakFlower 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 6px rgba(255,105,180,0.6));
+}
+@keyframes sakFlower { 0%,100%{filter:drop-shadow(0 0 5px rgba(255,105,180,0.5))} 50%{filter:drop-shadow(0 0 13px rgba(255,105,180,0.9))} }
+.pf-sakura-text { flex: 1; min-width: 0; }
+.pf-sakura-count { color: #ffd700; font-size: 17px; font-weight: 900; line-height: 1; }
+.pf-sakura-sublabel { color: rgba(255,255,255,0.45); font-size: 8.5px; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+.pf-sakura-badge {
+  background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.18);
+  color: rgba(255,255,255,0.55); font-size: 8px; font-weight: 800;
+  padding: 5px 9px; border-radius: 8px; letter-spacing: 1px; white-space: nowrap;
+  transition: all 0.2s; pointer-events: none;
+}
+.pf-sakura-row.longpressing .pf-sakura-badge {
+  background: linear-gradient(135deg,#ff69b4,#ff1493);
+  color: white; border-color: #ff69b4;
+  box-shadow: 0 0 12px rgba(255,105,180,0.6);
+}
+.pf-sakura-hint {
+  position: absolute; top: -26px; left: 50%; transform: translateX(-50%);
+  background: rgba(255,20,147,0.92); color: white;
+  font-size: 9px; font-weight: 800; padding: 3px 10px;
+  border-radius: 8px; letter-spacing: 1px; white-space: nowrap;
+  opacity: 0; pointer-events: none; transition: opacity 0.2s;
+}
+.pf-sakura-row.longpressing .pf-sakura-hint { opacity: 1; }
     /* Extra right panel - hidden in portrait */
     .pf-extra-panel { display: none; }
     .pf-battle-royale-box { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 10px 12px; margin-bottom: 10px; }
@@ -1412,9 +1494,16 @@
     <!-- LEFT PANEL: player info + stats -->
     <div class="pf-left-panel" id="pf-right-panel">
       <div class="pf-player-header">
-        <div class="pf-avatar">🎭</div>
+        <div class="pf-avatar" id="pf-avatar-box">
+          <span id="pf-avatar-emoji">🎭</span>
+        </div>
         <div class="pf-player-meta">
-          <h2>Naomi</h2>
+          <h2>Naomi<button class="pf-edit-btn" title="Editar nombre">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+          </button></h2>
           <div class="pf-uid">UID: 10292439675</div>
           <div class="pf-lang">Español • México</div>
         </div>
