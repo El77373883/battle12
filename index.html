@@ -2582,7 +2582,7 @@
       // ===== CÉSPED 3D =====
       const grassAreas = [];
       // Crear 30 grupos de césped decorativo
-      for (let g = 0; g < 30; g++) {
+      for (let g = 0; g < 40; g++) {
         const gAngle = Math.random() * Math.PI * 2;
         const gDist = 5 + Math.random() * 80;
         const gx = Math.cos(gAngle) * gDist;
@@ -3025,6 +3025,17 @@
 
       // ---- PLAYING ----
       if (currentState === State.PLAYING && playerModel) {
+        // Movimiento del césped con viento en partida
+        scene.children.forEach(child => {
+          if (child.isGroup && child.children.length >= 10 && child.children.length <= 15) {
+            child.children.forEach(blade => {
+              if (blade.isMesh && blade.geometry.type === 'PlaneGeometry') {
+                blade.rotation.z += Math.sin(lobbyTime * 2 + blade.position.x) * 0.003;
+                blade.rotation.x += Math.cos(lobbyTime * 2 + blade.position.z) * 0.002;
+              }
+            });
+          }
+        });
         const GRAVITY = 22;
         const SPEED   = 10;
 
