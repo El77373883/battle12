@@ -803,6 +803,11 @@
     // ===== GLOBALS =====
     let loadedPlayerGLTF = null;
     let lobbyModel, playerModel, parachuteModel, planeGroup, weaponModel;
+    let dropPlane = null;
+    let airdropBox = null;
+    let smokeParticles = [];
+    let airdropDropped = false;
+
     let localPlayer = {
       position: new THREE.Vector3(0, 50, 0),
       velocity: new THREE.Vector3(0, 0, 0),
@@ -1774,47 +1779,55 @@
 
     // ===== GAME LOOP =====
     function updateGame(delta) {
-      // ---- LOBBY ----
-      if (currentState === State.LOBBY && lobbyModel) {
-        lobbyTime += delta;
-        lobbyModel.position.y = 0.3 + Math.sin(lobbyTime*1.5)*0.06;
-        lobbyModel.rotation.y += delta*0.4;
-        if (weaponModel) {
-          weaponModel.position.x=0.65+Math.sin(lobbyTime*2)*0.05;
-          weaponModel.position.y=1.15+Math.cos(lobbyTime*3)*0.08;
-          weaponModel.rotation.z=-0.5+Math.sin(lobbyTime*2.5)*0.2;
-          weaponModel.rotation.y=0.3+Math.cos(lobbyTime*2)*0.15;
-          weaponModel.rotation.x=Math.sin(lobbyTime*3)*0.1;
-        }
-        const camX=Math.sin(lobbyTime*0.4)*2, camZ=5.5+Math.cos(lobbyTime*0.4)*1.5;
-        camera.position.lerp(new THREE.Vector3(camX,3.5,camZ),0.03);
-        camera.lookAt(0,2.2,0);
-      }
-      
-            // ---- JUMPING / CAÍDA ----
-      if (currentState === State.JUMPING && playerModel) {
-        playerModel.position.y -= 8 * delta; // Velocidad de caída
-        
-        if (parachuteModel) {
-          parachuteModel.position.set(playerModel.position.x, playerModel.position.y + 0.5, playerModel.position.z);
-        }
+      // ... (Aquí está tu código de Lobby, Jumping y Playing) ...
+      // ... (Baja hasta el final de la función updateGame) ...
 
-        // --- BLOQUE PARA BORRAR PARACAÍDAS AL TOCAR SUELO ---
-        if (playerModel.position.y <= 0) {
-          playerModel.position.y = 0;
-          currentState = State.PLAYING;
-          
-          if (parachuteModel) {
-            scene.remove(parachuteModel);
-            parachuteModel.traverse((child) => {
-              if (child.geometry) child.geometry.dispose();
-              if (child.material) child.material.dispose();
-            });
-            parachuteModel = null;
-            console.log("Aterrizaje exitoso: Paracaídas eliminado");
-          }
-        }
+      // 1. PRIMERO BUSCA DONDE TERMINA LO DEL MINIMAPA (que es lo último que tienes)
+      if (playerModel && currentState === State.PLAYING) {
+          const px=55+(localPlayer.position.x/120)*48;
+          const py=55+(localPlayer.position.z/120)*48;
+          ctxMinimap.fillStyle='#FFD700'; ctxMinimap.beginPath(); ctxMinimap.arc(px,py,5,0,Math.PI*2); ctxMinimap.fill();
+          // ... etc
       }
+
+      // 2. JUSTO AQUÍ PEGAS LO DEL AVIÓN (Antes de la última llave):
+      
+      // --- LÓGICA DEL AVION Y AIRDROP ---
+      if (dropPlane) {
+          dropPlane.position.x += 25 * delta; 
+          if (!airdropDropped && dropPlane.position.x > 0) {
+              airdropBox.position.copy(dropPlane.position);
+              airdropBox.visible = true;
+              airdropDropped = true;
+          }
+          if (dropPlane.position.x > 150) { 
+              scene.remove(dropPlane); 
+              dropPlane = null; 
+          }
+      }
+
+      if (airdropDropped && airdropBox) {
+          if (airdropBox.position.y > 0) {
+              airdropBox.position.y -= 6 * delta; 
+          } else {
+              airdropBox.position.y = 0;
+              if (Math.random() < 0.1) createSmoke(airdropBox.position); 
+          }
+      }
+
+      for (let i = smokeParticles.length - 1; i >= 0; i--) {
+          let p = smokeParticles[i];
+          p.position.add(p.userData.vel);
+          p.userData.life -= 0.01;
+          p.scale.setScalar(p.userData.life * 2);
+          if (p.userData.life <= 0) { 
+              scene.remove(p); 
+              smokeParticles.splice(i, 1); 
+          }
+      }
+
+  
+
 
 
       // ---- PLAYING ----
@@ -1937,6 +1950,43 @@
     createBeautifulWorld();
     setupLobby();
     animate();
+    
+    
+    function spawnAirdropEvent() {
+    // 1. Crear el Avión (un bloque gris aerodinámico)
+    dropPlane = new THREE.Group();
+    const body = new THREE.Mesh(new THREE.BoxGeometry(10, 2, 4), new THREE.MeshStandardMaterial({color: 0x333333}));
+    const wings = new THREE.Mesh(new THREE.BoxGeometry(4, 0.5, 15), new THREE.MeshStandardMaterial({color: 0x333333}));
+    dropPlane.add(body, wings);
+    dropPlane.position.set(-100, 40, (Math.random() - 0.5) * 100); // Viene desde lejos
+    scene.add(dropPlane);
+
+    // 2. Crear la Caja (Crate)
+    airdropBox = new THREE.Mesh(
+        new THREE.BoxGeometry(2, 2, 2),
+        new THREE.MeshStandardMaterial({color: 0x800000, metalness: 0.7}) // Rojo oscuro metálico
+    );
+    airdropBox.visible = false; // Oculta hasta que caiga
+    scene.add(airdropBox);
+
+    airdropDropped = false;
+}
+
+function createSmoke(pos) {
+    const p = new THREE.Mesh(
+        new THREE.SphereGeometry(0.4, 8, 8),
+        new THREE.MeshBasicMaterial({color: 0xff0000, transparent: true, opacity: 0.6})
+    );
+    p.position.copy(pos);
+    p.userData = {
+        vel: new THREE.Vector3((Math.random()-0.5)*0.05, 0.1, (Math.random()-0.5)*0.05),
+        life: 1.0
+    };
+    scene.add(p);
+    smokeParticles.push(p);
+}
+
+    
   </script>
 </body>
 </html>
