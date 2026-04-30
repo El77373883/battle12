@@ -1110,6 +1110,10 @@
   <audio id="bg-music" loop preload="auto">
     <source src="https://archive.org/download/electronic-guitar/Electronic%20Guitar.mp3" type="audio/mpeg">
   </audio>
+  
+  <audio id="water-sound" loop preload="auto" volume="0.3">
+  <source src="https://www.soundjay.com/nature/sounds/river-1.mp3" type="audio/mpeg">
+</audio>
 
   <div id="game-ui">
     <div class="top-bar" id="top-bar">
@@ -1935,6 +1939,8 @@
     const planeHud          = document.getElementById('plane-hud');
     const musicToggle       = document.getElementById('music-toggle');
     const bgMusic           = document.getElementById('bg-music');
+    const waterSound = document.getElementById('water-sound');
+    if (waterSound) { waterSound.volume = 0.3; waterSound.loop = true; }
     const profileOverlay    = document.getElementById('profile-overlay');
     const profileTrigger    = document.getElementById('profile-trigger');
     const closeProfileBtn   = document.getElementById('close-profile-btn');
@@ -2621,39 +2627,106 @@
         obstacles.push({position: new THREE.Vector3(x, 0, z), radius: 25, height: height});
       }
       
-      // ===== LAGOS =====
+      // ===== LAGOS CON AGUA ANIMADA =====
+      const waterLakes = []; // Para animar después
+      
       for (let l = 0; l < 8; l++) {
         const lAngle = Math.random() * Math.PI * 2;
         const lDist = 60 + Math.random() * 700;
         const lx = Math.cos(lAngle) * lDist;
         const lz = Math.sin(lAngle) * lDist;
+        const lakeSize = 8 + Math.random() * 25;
         
-        const lakeGeo = new THREE.CircleGeometry(8 + Math.random() * 25, 32);
-        const lakeMat = new THREE.MeshStandardMaterial({
-          color: 0x2266aa, roughness: 0.1, metalness: 0.6, transparent: true, opacity: 0.85
+        // Agua con olas (PlaneGeometry para poder deformar)
+        const waterGeo = new THREE.PlaneGeometry(lakeSize * 2, lakeSize * 2, 32, 32);
+        const waterMat = new THREE.MeshStandardMaterial({
+          color: 0x115599,
+          roughness: 0.05,
+          metalness: 0.8,
+          transparent: true,
+          opacity: 0.88,
+          flatShading: false
         });
-        const lake = new THREE.Mesh(lakeGeo, lakeMat);
-        lake.rotation.x = -Math.PI / 2;
-        lake.position.set(lx, 0.05, lz);
-        scene.add(lake);
+        const water = new THREE.Mesh(waterGeo, waterMat);
+        water.rotation.x = -Math.PI / 2;
+        water.position.set(lx, 0.15, lz);
+        water.userData.isWater = true;
+        water.userData.waterSpeed = 0.5 + Math.random() * 1.5;
+        water.userData.originalY = 0.15;
+        scene.add(water);
+        waterLakes.push(water);
         
-        const shoreGeo = new THREE.TorusGeometry(8 + Math.random() * 25, 1.5 + Math.random() * 2, 8, 32);
-        const shoreMat = new THREE.MeshStandardMaterial({color: 0x8a7a5a, roughness: 0.9, flatShading: true});
+        // Capa 2 de agua (más clara, encima)
+        const waterGeo2 = new THREE.PlaneGeometry(lakeSize * 1.8, lakeSize * 1.8, 24, 24);
+        const waterMat2 = new THREE.MeshStandardMaterial({
+          color: 0x3399cc,
+          roughness: 0.02,
+          metalness: 0.9,
+          transparent: true,
+          opacity: 0.5,
+          flatShading: false
+        });
+        const water2 = new THREE.Mesh(waterGeo2, waterMat2);
+        water2.rotation.x = -Math.PI / 2;
+        water2.position.set(lx, 0.2, lz);
+        water2.userData.isWater = true;
+        water2.userData.waterSpeed = 0.7 + Math.random() * 1.3;
+        water2.userData.originalY = 0.2;
+        scene.add(water2);
+        waterLakes.push(water2);
+        
+        // Brillo del sol en el agua
+        const shineGeo = new THREE.PlaneGeometry(lakeSize * 0.5, lakeSize * 0.5, 8, 8);
+        const shineMat = new THREE.MeshBasicMaterial({
+          color: 0xffffff,
+          transparent: true,
+          opacity: 0.25,
+          side: THREE.DoubleSide
+        });
+        const shine = new THREE.Mesh(shineGeo, shineMat);
+        shine.rotation.x = -Math.PI / 2;
+        shine.position.set(lx + lakeSize * 0.3, 0.22, lz - lakeSize * 0.2);
+        shine.userData.isWater = true;
+        shine.userData.waterSpeed = 0.3;
+        shine.userData.originalY = 0.22;
+        scene.add(shine);
+        waterLakes.push(shine);
+        
+        // Orilla del lago
+        const shoreGeo = new THREE.TorusGeometry(lakeSize, 1.5 + Math.random() * 2, 8, 32);
+        const shoreMat = new THREE.MeshStandardMaterial({
+          color: 0x8a7a5a,
+          roughness: 0.9,
+          flatShading: true
+        });
         const shore = new THREE.Mesh(shoreGeo, shoreMat);
         shore.rotation.x = -Math.PI / 2;
         shore.position.set(lx, 0.08, lz);
         scene.add(shore);
         
+        // Rocas alrededor
         for (let lr = 0; lr < 6; lr++) {
           const lrAngle = Math.random() * Math.PI * 2;
-          const lrDist = 10 + Math.random() * 25;
+          const lrDist = lakeSize + 2 + Math.random() * 5;
           const rockGeo = new THREE.DodecahedronGeometry(0.5 + Math.random() * 2, 1);
-          const rockMat = new THREE.MeshStandardMaterial({color: 0x777777, roughness: 0.7, flatShading: true});
+          const rockMat = new THREE.MeshStandardMaterial({
+            color: 0x777777,
+            roughness: 0.7,
+            flatShading: true
+          });
           const rock = new THREE.Mesh(rockGeo, rockMat);
-          rock.position.set(lx + Math.cos(lrAngle) * lrDist, 0.2 + Math.random() * 0.5, lz + Math.sin(lrAngle) * lrDist);
+          rock.position.set(
+            lx + Math.cos(lrAngle) * lrDist,
+            0.2 + Math.random() * 0.5,
+            lz + Math.sin(lrAngle) * lrDist
+          );
           rock.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
           scene.add(rock);
         }
+        
+        // Guardar referencia global para animar
+        if (!window.waterLakes) window.waterLakes = [];
+        window.waterLakes = waterLakes;
       }
       
       // ===== CÉSPED 3D DETALLADO =====
@@ -3121,6 +3194,12 @@
         lobbyTime += delta;
         lobbyModel.position.y = 0.3 + Math.sin(lobbyTime * 1.5) * 0.06;
         lobbyModel.rotation.y += delta * 0.35;
+        // === ANIMACIÓN DEL AGUA EN LOBBY ===
+        scene.children.forEach(child => {
+          if (child.userData && child.userData.isWater) {
+            child.position.y = child.userData.originalY + Math.sin(lobbyTime * child.userData.waterSpeed + child.position.x) * 0.08;
+          }
+        });
         // Movimiento del césped con viento
         scene.children.forEach(child => {
           if (child.isGroup && child.userData.isGrass) {
@@ -3191,6 +3270,32 @@
 
       // ---- PLAYING ----
       if (currentState === State.PLAYING && playerModel) {
+        // === ANIMACIÓN DEL AGUA ===
+        if (window.waterLakes) {
+          let nearWater = false;
+          window.waterLakes.forEach(water => {
+            if (water.userData.isWater) {
+              // Ondas en el agua
+              water.position.y = water.userData.originalY + Math.sin(lobbyTime * water.userData.waterSpeed + water.position.x) * 0.08;
+              // Brillo que se mueve
+              if (water.material.opacity < 0.3) {
+                water.position.x += Math.sin(lobbyTime * 0.5) * 0.02;
+              }
+            }
+            // Verificar si el jugador está cerca del agua
+            if (water.userData.isWater && localPlayer.position.distanceTo(water.position) < 20) {
+              nearWater = true;
+            }
+          });
+          // Controlar sonido del agua
+          if (waterSound) {
+            if (nearWater && waterSound.paused) {
+              waterSound.play().catch(() => {});
+            } else if (!nearWater && !waterSound.paused) {
+              waterSound.pause();
+            }
+          }
+        }
         // Movimiento del césped y rocas con viento
         scene.children.forEach(child => {
           if (child.isGroup && child.userData.isGrass) {
