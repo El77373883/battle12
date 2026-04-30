@@ -2886,11 +2886,11 @@ function createDetailedSakura(x, z) {
       // ===== ÁRBOLES SAKURA (PRUEBA - FRENTE A LA CÁMARA) =====
       for (let i = 0; i < 5; i++) {
         const sx = -20 + i * 10;
-        const sz = 40;
+        const sz = -30;  // ⬅️ ANTES ERA 40, AHORA -30 (frente a la cámara)
         
         const sakura = createDetailedSakura(sx, sz);
         sakura.userData.isTree = true;
-        sakura.scale.set(5, 5, 5); // MUY GRANDE para prueba
+        sakura.scale.set(2, 2, 2);  // ⬅️ Más pequeño
         scene.add(sakura);
         obstacles.push({position: new THREE.Vector3(sx, 0, sz), radius: 3, height: 8});
       }
