@@ -1131,19 +1131,33 @@
 }
 .pase-close-btn:active { background: rgba(255,60,60,0.5); }
 
-/* Banner Sakura */
+/* Banner Sakura con IMAGEN */
 .pase-banner {
   position: relative; z-index: 5;
-  margin: 10px 14px; padding: 20px;
-  background: linear-gradient(135deg, rgba(255,105,180,0.2), rgba(255,20,147,0.3));
-  border: 2px solid rgba(255,105,180,0.4); border-radius: 16px;
-  text-align: center;
-  backdrop-filter: blur(10px);
+  margin: 10px 14px; padding: 0;
+  border-radius: 16px; overflow: hidden;
+  min-height: 200px;
+  display: flex; align-items: center; justify-content: center;
+  border: 2px solid rgba(255,105,180,0.5);
 }
-.pase-banner-icon { font-size: 50px; margin-bottom: 8px; animation: sakuraFloat 3s ease-in-out infinite; }
-@keyframes sakuraFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
-.pase-banner h3 { color: #ff69b4; font-size: 22px; font-weight: 900; letter-spacing: 2px; }
-.pase-banner p { color: rgba(255,255,255,0.7); font-size: 11px; margin-top: 5px; }
+.pase-banner-img {
+  width: 100%; height: 200px; display: block;
+  object-fit: cover;
+}
+.pase-banner-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, 
+    rgba(26,10,46,0.5) 0%, 
+    rgba(13,5,24,0.3) 50%, 
+    rgba(26,10,46,0.75) 100%);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center; padding: 20px;
+}
+.pase-banner-icon { font-size: 40px; margin-bottom: 4px; animation: sakuraFloat 3s ease-in-out infinite; }
+@keyframes sakuraFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+.pase-banner h3 { color: #ff69b4; font-size: 20px; font-weight: 900; letter-spacing: 2px; text-shadow: 0 0 20px rgba(255,105,180,0.8); }
+.pase-banner p { color: rgba(255,255,255,0.78); font-size: 10px; margin-top: 2px; }
 
 /* Contador de medallas */
 .pase-medals-counter {
@@ -1198,21 +1212,6 @@
   margin: 0 14px; padding-bottom: max(20px, env(safe-area-inset-bottom));
 }
 .pase-rewards-title { color: rgba(255,255,255,0.5); font-size: 10px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
-.pase-rewards-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-.pase-reward-item {
-  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 10px; padding: 8px 4px; text-align: center;
-  transition: 0.2s; cursor: pointer;
-}
-.pase-reward-item.claimed { opacity: 0.4; border-color: rgba(0,255,0,0.3); }
-.pase-reward-item.current { border-color: #ff69b4; box-shadow: 0 0 15px rgba(255,105,180,0.4); }
-.pase-reward-icon { font-size: 24px; }
-.pase-reward-name { color: white; font-size: 7px; font-weight: 700; margin-top: 4px; }
-.pase-reward-level { color: #ff69b4; font-size: 7px; font-weight: 800; }
-
-.pase-reward-medal { color: #ffd700; font-size: 7px; font-weight: 800; }
-
-/* Recompensas mejoradas */
 .pase-rewards-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .pase-reward-item {
   background: rgba(0,0,0,0.6); border: 2px solid rgba(255,255,255,0.15);
@@ -1234,7 +1233,6 @@
 }
 .pase-reward-btn:active { transform:scale(0.95); }
 .pase-reward-btn.claimed { background:rgba(0,255,0,0.2); color:#0f0; border:1px solid rgba(0,255,0,0.3); }
-
 /* ===== MEDALLAS EN PERFIL ===== */
 .pf-sakura-medals {
   position: relative; z-index: 10;
@@ -4047,13 +4045,33 @@ function claimReward(reward) {
 
 // Inicializar el Pase Sakura
 function initPaseSakura() {
-  document.getElementById('total-medals-count').textContent = paseSakuraData.medals + ' / ' + paseSakuraData.maxMedals;
-  document.getElementById('pase-level-display').textContent = 'Nivel ' + paseSakuraData.level + '/' + paseSakuraData.maxLevel;
-  document.getElementById('pase-progress-bar').style.width = (paseSakuraData.level / paseSakuraData.maxLevel * 100) + '%';
+  // Contador de medallas en ambas secciones
+  const medalsText = paseSakuraData.medals + ' / ' + paseSakuraData.maxMedals;
+  const totalMedalsEl = document.getElementById('total-medals-count');
+  const totalMedalsEl2 = document.getElementById('total-medals-count-2');
+  if (totalMedalsEl) totalMedalsEl.textContent = medalsText;
+  if (totalMedalsEl2) totalMedalsEl2.textContent = medalsText;
+  
+  // Barra de progreso
+  const levelEl = document.getElementById('pase-level-display');
+  const progressBar = document.getElementById('pase-progress-bar');
+  if (levelEl) levelEl.textContent = 'Nivel ' + paseSakuraData.level + '/' + paseSakuraData.maxLevel;
+  if (progressBar) progressBar.style.width = (paseSakuraData.level / paseSakuraData.maxLevel * 100) + '%';
+  
+  // ===== MOSTRAR / OCULTAR SECCIONES =====
+  const compraSection = document.getElementById('pase-compra-section');
+  const recompensasSection = document.getElementById('pase-recompensas-section');
   
   if (paseSakuraData.active) {
+    // TIENE PASE → ocultar botones, mostrar recompensas
+    if (compraSection) compraSection.style.display = 'none';
+    if (recompensasSection) recompensasSection.style.display = 'block';
     document.getElementById('pase-' + paseSakuraData.type).classList.add('selected');
     document.getElementById('sakura-notif').style.display = 'none';
+  } else {
+    // NO TIENE PASE → mostrar botones, ocultar recompensas
+    if (compraSection) compraSection.style.display = 'block';
+    if (recompensasSection) recompensasSection.style.display = 'none';
   }
   
   renderPaseRewards();
@@ -4070,12 +4088,10 @@ document.getElementById('close-pase-sakura').addEventListener('click', () => {
   document.getElementById('pase-sakura-overlay').classList.remove('active');
 });
 
-
 // Notificación inicial
 setTimeout(() => {
   document.getElementById('sakura-notif').style.display = 'block';
 }, 2000);
-    
 
     // ===== DATA: SKINS / OUTFITS =====
     const INV_DATA = {
