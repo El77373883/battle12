@@ -1030,8 +1030,14 @@
 #pase-sakura-overlay.active { display: flex; }
 .pase-sakura-bg {
   position: fixed; inset: 0;
-  background: linear-gradient(180deg, #1a0a2e 0%, #0d0518 50%, #1a0a2e 100%);
+  background: url('https://archive.org/download/img-7185_202604/IMG_7185.png') center/cover no-repeat;
   z-index: 0;
+  opacity: 0.3;
+}
+.pase-sakura-bg::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(26,10,46,0.85) 0%, rgba(13,5,24,0.9) 50%, rgba(26,10,46,0.85) 100%);
 }
 .pase-header {
   position: relative; z-index: 5;
@@ -1129,7 +1135,31 @@
 .pase-reward-icon { font-size: 24px; }
 .pase-reward-name { color: white; font-size: 7px; font-weight: 700; margin-top: 4px; }
 .pase-reward-level { color: #ff69b4; font-size: 7px; font-weight: 800; }
+
 .pase-reward-medal { color: #ffd700; font-size: 7px; font-weight: 800; }
+
+/* Recompensas mejoradas */
+.pase-rewards-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.pase-reward-item {
+  background: rgba(0,0,0,0.6); border: 2px solid rgba(255,255,255,0.15);
+  border-radius: 10px; padding: 8px 5px; text-align: center;
+  cursor: pointer; position: relative; min-height: 100px;
+}
+.pase-reward-item.claimed { opacity: 0.5; border-color: #00ff00; }
+.pase-reward-item.claimed::after { content:'✅'; position:absolute; top:3px; right:5px; font-size:12px; z-index:2; }
+.pase-reward-item.current { border-color:#ff69b4; box-shadow:0 0 15px rgba(255,105,180,0.5); animation: pulseReward 2s infinite; }
+@keyframes pulseReward { 0%,100%{box-shadow:0 0 15px rgba(255,105,180,0.5)} 50%{box-shadow:0 0 25px rgba(255,105,180,0.8)} }
+.pase-reward-img { width:40px; height:40px; margin:0 auto 5px; display:flex; align-items:center; justify-content:center; }
+.pase-reward-img img { width:100%; height:100%; object-fit:contain; border-radius:6px; }
+.pase-reward-name { color:white; font-size:7px; font-weight:700; line-height:1.2; }
+.pase-reward-level { color:#ff69b4; font-size:7px; font-weight:800; background:rgba(255,105,180,0.15); padding:2px 6px; border-radius:8px; display:inline-block; margin:3px 0; }
+.pase-reward-btn {
+  width:100%; margin-top:4px; padding:5px; border-radius:6px;
+  border:none; font-size:7px; font-weight:800; cursor:pointer;
+  background:linear-gradient(180deg,#ffd700,#ff9500); color:#1a0800; letter-spacing:0.5px;
+}
+.pase-reward-btn:active { transform:scale(0.95); }
+.pase-reward-btn.claimed { background:rgba(0,255,0,0.2); color:#0f0; border:1px solid rgba(0,255,0,0.3); }
 
 /* ===== MEDALLAS EN PERFIL ===== */
 .pf-sakura-medals {
@@ -1151,6 +1181,7 @@
 }
 .pf-sakura-medal-badge.active { background: linear-gradient(135deg, #ffd700, #ffaa00); color: #1a0800; box-shadow: 0 0 15px rgba(255,200,0,0.5); }
 .pf-sakura-medal-badge.inactive { background: rgba(128,128,128,0.3); color: #888; }
+
 
     /* ===== ADS / CROUCH / LOOT BUTTONS ===== */
     #ads-btn {
@@ -3736,22 +3767,32 @@ let paseSakuraData = {
 
 // Recompensas del pase (50 niveles)
 const PASE_REWARDS = [
-  { level:1,  icon:'🏅', name:'Medalla Bronce', medals:5,  type:'free' },
-  { level:2,  icon:'💎', name:'100 Diamantes', diamonds:100, type:'free' },
-  { level:3,  icon:'🪙', name:'50 Oro', gold:50, type:'free' },
-  { level:4,  icon:'🏅', name:'Medalla Plata', medals:10, type:'basico' },
-  { level:5,  icon:'🌸', name:'Skin Sakura', type:'elite', special:'skin_sakura' },
-  { level:6,  icon:'💎', name:'200 Diamantes', diamonds:200, type:'basico' },
-  { level:7,  icon:'🏅', name:'Medalla Oro', medals:20, type:'elite' },
-  { level:8,  icon:'🛡️', name:'Escudo Sakura', type:'elite', special:'shield_sakura' },
-  { level:9,  icon:'🏅', name:'Medalla Épica', medals:15, type:'basico' },
-  { level:10, icon:'🎭', name:'Personaje Exclusivo', type:'elite', special:'char_sakura' },
-  { level:15, icon:'🏅', name:'Medalla Legendaria', medals:50, type:'elite' },
-  { level:20, icon:'🏍️', name:'Moto Sakura', type:'elite', special:'vehicle_sakura' },
-  { level:25, icon:'🏅', name:'100 Medallas', medals:100, type:'elite' },
-  { level:30, icon:'👑', name:'Corona Sakura', type:'elite', special:'crown_sakura' },
-  { level:40, icon:'💎', name:'500 Diamantes', diamonds:500, type:'elite' },
-  { level:50, icon:'🏆', name:'Trofeo Supremo', type:'elite', special:'trophy_sakura' },
+  { level:1,  icon:'🪖', name:'Casco Táctico', type:'free', img:'https://cdn-icons-png.flaticon.com/128/2990/2990703.png', desc:'Protección básica' },
+  { level:2,  icon:'💎', name:'50 Diamantes', diamonds:50, type:'free', img:'https://cdn-icons-png.flaticon.com/128/2936/2936892.png', desc:'Moneda premium' },
+  { level:3,  icon:'🎒', name:'Mochila Verde', type:'free', img:'https://cdn-icons-png.flaticon.com/128/2331/2331891.png', desc:'+50 capacidad' },
+  { level:4,  icon:'🏅', name:'5 Medallas', medals:5, type:'basico', img:'https://cdn-icons-png.flaticon.com/128/2583/2583434.png', desc:'Medallas Sakura' },
+  { level:5,  icon:'🔫', name:'Skin Arma', type:'elite', img:'https://cdn-icons-png.flaticon.com/128/2917/2917628.png', desc:'Skin exclusiva' },
+  { level:6,  icon:'💎', name:'100 Diamantes', diamonds:100, type:'basico', img:'https://cdn-icons-png.flaticon.com/128/2936/2936892.png', desc:'Moneda premium' },
+  { level:7,  icon:'👕', name:'Camiseta', type:'free', img:'https://cdn-icons-png.flaticon.com/128/2331/2331891.png', desc:'Ropa casual' },
+  { level:8,  icon:'🏅', name:'10 Medallas', medals:10, type:'basico', img:'https://cdn-icons-png.flaticon.com/128/2583/2583434.png', desc:'Medallas Sakura' },
+  { level:9,  icon:'🪙', name:'200 Oro', gold:200, type:'free', img:'https://cdn-icons-png.flaticon.com/128/2481/2481126.png', desc:'Moneda de juego' },
+  { level:10, icon:'🌸', name:'Skin Sakura', type:'elite', img:'https://cdn-icons-png.flaticon.com/128/3468/3468373.png', desc:'Aspecto floral' },
+  { level:12, icon:'💎', name:'150 Diamantes', diamonds:150, type:'basico', img:'https://cdn-icons-png.flaticon.com/128/2936/2936892.png', desc:'Moneda premium' },
+  { level:14, icon:'🏅', name:'15 Medallas', medals:15, type:'elite', img:'https://cdn-icons-png.flaticon.com/128/2583/2583434.png', desc:'Medallas Sakura' },
+  { level:16, icon:'🛡️', name:'Chaleco', type:'free', img:'https://cdn-icons-png.flaticon.com/128/2990/2990703.png', desc:'Protección media' },
+  { level:18, icon:'🪙', name:'300 Oro', gold:300, type:'basico', img:'https://cdn-icons-png.flaticon.com/128/2481/2481126.png', desc:'Moneda de juego' },
+  { level:20, icon:'🏍️', name:'Moto Sakura', type:'elite', img:'https://cdn-icons-png.flaticon.com/128/3097/3097929.png', desc:'Vehículo exclusivo' },
+  { level:22, icon:'💎', name:'200 Diamantes', diamonds:200, type:'basico', img:'https://cdn-icons-png.flaticon.com/128/2936/2936892.png', desc:'Moneda premium' },
+  { level:25, icon:'🏅', name:'25 Medallas', medals:25, type:'elite', img:'https://cdn-icons-png.flaticon.com/128/2583/2583434.png', desc:'Medallas Sakura' },
+  { level:28, icon:'🎭', name:'Máscara', type:'free', img:'https://cdn-icons-png.flaticon.com/128/3468/3468373.png', desc:'Accesorio facial' },
+  { level:30, icon:'💎', name:'300 Diamantes', diamonds:300, type:'elite', img:'https://cdn-icons-png.flaticon.com/128/2936/2936892.png', desc:'Moneda premium' },
+  { level:33, icon:'🪙', name:'500 Oro', gold:500, type:'basico', img:'https://cdn-icons-png.flaticon.com/128/2481/2481126.png', desc:'Moneda de juego' },
+  { level:35, icon:'🏅', name:'40 Medallas', medals:40, type:'elite', img:'https://cdn-icons-png.flaticon.com/128/2583/2583434.png', desc:'Medallas Sakura' },
+  { level:38, icon:'🔫', name:'Rifle Elite', type:'elite', img:'https://cdn-icons-png.flaticon.com/128/2917/2917628.png', desc:'Arma legendaria' },
+  { level:40, icon:'💎', name:'500 Diamantes', diamonds:500, type:'elite', img:'https://cdn-icons-png.flaticon.com/128/2936/2936892.png', desc:'Moneda premium' },
+  { level:43, icon:'🏅', name:'50 Medallas', medals:50, type:'elite', img:'https://cdn-icons-png.flaticon.com/128/2583/2583434.png', desc:'Medallas Sakura' },
+  { level:46, icon:'👑', name:'Corona Dorada', type:'elite', img:'https://cdn-icons-png.flaticon.com/128/3097/3097929.png', desc:'Ítem de prestigio' },
+  { level:50, icon:'🏆', name:'Trofeo Supremo', type:'elite', img:'https://cdn-icons-png.flaticon.com/128/2583/2583434.png', desc:'Recompensa final' },
 ];
 
 // Medallas en perfil
@@ -3827,59 +3868,65 @@ window.selectPase = function(type) {
 function renderPaseRewards() {
   const grid = document.getElementById('pase-rewards-grid');
   if (!grid) return;
-  
   grid.innerHTML = '';
+  
   PASE_REWARDS.forEach(reward => {
     const div = document.createElement('div');
-    let className = 'pase-reward-item';
+    const isClaimed = localStorage.getItem('pase_claimed_' + reward.level) === 'true';
+    const canClaim = paseSakuraData.level >= reward.level && !isClaimed;
     
-    if (paseSakuraData.level >= reward.level) {
-      className += ' claimed';
-    } else if (paseSakuraData.level + 1 === reward.level) {
-      className += ' current';
-    }
+    div.className = 'pase-reward-item';
+    if (isClaimed) div.classList.add('claimed');
+    if (canClaim) div.classList.add('current');
     
-    div.className = className;
     div.innerHTML = `
-      <div class="pase-reward-icon">${reward.icon}</div>
+      <div class="pase-reward-img">
+        ${reward.img ? `<img src="${reward.img}" alt="${reward.name}" onerror="this.innerHTML='<span style=font-size:28px>${reward.icon}</span>'">` : `<span style="font-size:28px">${reward.icon}</span>`}
+      </div>
       <div class="pase-reward-name">${reward.name}</div>
       <div class="pase-reward-level">Nv.${reward.level}</div>
-      ${reward.medals ? `<div class="pase-reward-medal">🏅 ${reward.medals}</div>` : ''}
+      ${isClaimed ? 
+        '<button class="pase-reward-btn claimed">RECLAMADO ✓</button>' : 
+        `<button class="pase-reward-btn" onclick="claimRewardById(${reward.level})" ${!canClaim ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : ''}>RECLAMAR</button>`
+      }
     `;
-    
-    div.onclick = () => claimReward(reward);
     grid.appendChild(div);
   });
 }
 
-function claimReward(reward) {
-  if (paseSakuraData.level < reward.level) {
-    alert('¡Necesitas alcanzar el nivel ' + reward.level + '!');
-    return;
-  }
-  
-  if (reward.diamonds) {
-    paseSakuraData.diamonds += reward.diamonds;
-    alert('¡Recibiste ' + reward.diamonds + ' 💎!');
-  }
-  if (reward.gold) {
-    paseSakuraData.gold += reward.gold;
-    alert('¡Recibiste ' + reward.gold + ' 🪙!');
-  }
-  if (reward.medals) {
-    paseSakuraData.medals = Math.min(paseSakuraData.maxMedals, paseSakuraData.medals + reward.medals);
-    alert('¡Recibiste ' + reward.medals + ' 🏅 Medallas Sakura!');
-  }
-  if (reward.special) {
-    alert('¡Desbloqueaste: ' + reward.name + '! 🎉');
-  }
-  
-  document.getElementById('total-medals-count').textContent = paseSakuraData.medals + ' / ' + paseSakuraData.maxMedals;
-  updateCurrencyDisplay();
-  updateProfileMedals();
-  renderPaseRewards();
-}
 
+function renderPaseRewards() {
+  const grid = document.getElementById('pase-rewards-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  
+  PASE_REWARDS.forEach(reward => {
+    const div = document.createElement('div');
+    const isClaimed = localStorage.getItem('pase_claimed_' + reward.level) === 'true';
+    const canClaim = paseSakuraData.level >= reward.level && !isClaimed;
+    
+    div.className = 'pase-reward-item';
+    if (isClaimed) div.classList.add('claimed');
+    if (canClaim && !isClaimed) div.classList.add('current');
+    
+    div.innerHTML = `
+      <div class="pase-reward-img">
+        ${reward.img ? 
+          `<img src="${reward.img}" alt="${reward.name}" onerror="this.innerHTML='<span style=font-size:28px>${reward.icon}</span>'">` : 
+          `<span style="font-size:28px">${reward.icon}</span>`
+        }
+      </div>
+      <div class="pase-reward-name">${reward.name}</div>
+      <div class="pase-reward-level">Nv.${reward.level}</div>
+      ${reward.medals ? `<div class="pase-reward-medal">🏅 ${reward.medals}</div>` : ''}
+      ${isClaimed ? 
+        '<button class="pase-reward-btn claimed">✓ RECLAMADO</button>' : 
+        `<button class="pase-reward-btn" onclick="claimReward(PASE_REWARDS.find(r=>r.level===${reward.level}))" ${!canClaim ? 'disabled style="opacity:0.4;cursor:not-allowed;"' : ''}>RECLAMAR</button>`
+      }
+    `;
+    grid.appendChild(div);
+  });
+}
 // Inicializar el Pase Sakura
 function initPaseSakura() {
   document.getElementById('total-medals-count').textContent = paseSakuraData.medals + ' / ' + paseSakuraData.maxMedals;
