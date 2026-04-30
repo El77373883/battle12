@@ -2591,15 +2591,15 @@
       }
       
       grassAreas.forEach(pos => {
-        const grassGroup = new THREE.Group();
-        grassGroup.userData.isGrass = true; // ⬅️ AGREGAR ESTA LÍNEA
+  const grassGroup = new THREE.Group();
+  grassGroup.userData.isGrass = true; // MARCA DE IDENTIFICACIÓN
         const grassMat1 = new THREE.MeshStandardMaterial({color: 0x2d6e1a, roughness: 0.8, side: THREE.DoubleSide});
         const grassMat2 = new THREE.MeshStandardMaterial({color: 0x3a7a2a, roughness: 0.7, side: THREE.DoubleSide});
         const grassMat3 = new THREE.MeshStandardMaterial({color: 0x1e5c1e, roughness: 0.9, side: THREE.DoubleSide});
         
         for (let j = 0; j < 15; j++) {
           const bladeMat = [grassMat1, grassMat2, grassMat3][Math.floor(Math.random() * 3)];
-          const bladeGeo = new THREE.PlaneGeometry(0.08, 0.3 + Math.random() * 0.6);
+          const bladeGeo = new THREE.PlaneGeometry(0.15, 0.6 + Math.random() * 1.2);
           const blade = new THREE.Mesh(bladeGeo, bladeMat);
           
           blade.position.set(
@@ -3028,7 +3028,7 @@
       if (currentState === State.PLAYING && playerModel) {
         // Movimiento del césped con viento en partida
         scene.children.forEach(child => {
-          if (child.isGroup && child.children.length >= 10 && child.children.length <= 15) {
+          if (child.isGroup && child.userData.isGrass) {
             child.children.forEach(blade => {
               if (blade.isMesh && blade.geometry.type === 'PlaneGeometry') {
                 blade.rotation.z += Math.sin(lobbyTime * 2 + blade.position.x) * 0.003;
