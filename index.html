@@ -976,7 +976,8 @@
     .pf-stat-val { font-size: 16px; font-weight: 900; color: #ffd700; line-height: 1; }
     .pf-stat-lbl { font-size: 8px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 3px; }
 /* ===== MEDALLAS DE PASE COMPACTAS ===== */
-.pf-medals-section { position: relative; z-index: 10; padding: 0 0 6px; flex-shrink: 0; }
+/* ===== MEDALLA SAKURA ÚNICA ===== */
+.pf-medals-section { position: relative; z-index: 10; padding: 0; flex-shrink: 0; }
 .pf-medals-title {
   font-size: 8px; font-weight: 900; color: #ffd700;
   letter-spacing: 2px; text-transform: uppercase;
@@ -987,22 +988,33 @@
   width: 3px; height: 10px; background: #ffd700; border-radius: 2px;
 }
 .pf-medals-row {
-  display: flex; gap: 8px; justify-content: flex-start; flex-wrap: wrap;
+  display: flex; align-items: center; gap: 10px;
 }
-.pf-medal {
-  display: flex; flex-direction: column; align-items: center; gap: 2px;
-  cursor: pointer;
+.pf-sakura-single-medal {
+  width: 44px; height: 44px;
+  border-radius: 10px;
+  background: rgba(128,128,128,0.15);
+  border: 2px solid rgba(128,128,128,0.3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  filter: grayscale(100%);
+  transition: all 0.3s;
 }
-.pf-medal svg {
-  width: 28px; height: 34px;
-  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.5));
-  transition: transform 0.15s;
+.pf-sakura-single-medal.has-medals {
+  filter: grayscale(0%);
+  border-color: #ff69b4;
+  background: rgba(255,105,180,0.15);
+  box-shadow: 0 0 12px rgba(255,105,180,0.3);
 }
-.pf-medal:active svg { transform: scale(0.9); }
-.pf-medal-tooltip {
-  color: rgba(255,255,255,0.45);
-  font-size: 6px; font-weight: 600;
-  letter-spacing: 0.3px; text-align: center;
+.pf-sakura-count-box {
+  display: flex; flex-direction: column;
+}
+.pf-sakura-count {
+  color: white; font-size: 18px; font-weight: 900;
+}
+.pf-sakura-count-label {
+  color: rgba(255,255,255,0.5); font-size: 8px;
+  letter-spacing: 0.5px;
 }
 /* ===== LÁPIZ EDITAR NOMBRE ===== */
 .pf-edit-btn {
@@ -1510,100 +1522,16 @@
   </div>
   <div class="pf-sakura-medal-badge inactive">SIN PASE</div>
 </div>
-      <div class="pf-medals-section">
-        <div class="pf-medals-title">Medallas de Pase</div>
-        <div class="pf-medals-row">
-          <!-- BRONCE -->
-          <div class="pf-medal bronze">
-            <svg viewBox="0 0 44 52" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <line x1="22" y1="0" x2="22" y2="16" stroke="#7a4a1e" stroke-width="4" stroke-linecap="round"/>
-              <line x1="14" y1="2" x2="22" y2="16" stroke="#6b3e18" stroke-width="3" stroke-linecap="round"/>
-              <circle cx="22" cy="32" r="18" fill="url(#b1)"/>
-              <circle cx="22" cy="32" r="14" fill="url(#b2)"/>
-              <circle cx="22" cy="32" r="10" fill="url(#b3)" opacity="0.6"/>
-              <path d="M22 24 L24 29 L30 29 L25 33 L27 38 L22 34 L17 38 L19 33 L14 29 L20 29 Z" fill="#c87840" opacity="0.8"/>
-              <defs>
-                <radialGradient id="b1" cx="38%" cy="30%"><stop offset="0%" stop-color="#e8a060"/><stop offset="100%" stop-color="#5c3010"/></radialGradient>
-                <radialGradient id="b2" cx="38%" cy="30%"><stop offset="0%" stop-color="#d48840"/><stop offset="100%" stop-color="#7a4a1e"/></radialGradient>
-                <radialGradient id="b3" cx="30%" cy="25%"><stop offset="0%" stop-color="#ffd090" stop-opacity="0.9"/><stop offset="100%" stop-color="#c07030" stop-opacity="0"/></radialGradient>
-              </defs>
-            </svg>
-            <div class="pf-medal-tooltip">Bronce - Temp 1</div>
-          </div>
-          <!-- PLATA -->
-          <div class="pf-medal silver">
-            <svg viewBox="0 0 44 52" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <line x1="22" y1="0" x2="22" y2="16" stroke="#888" stroke-width="4" stroke-linecap="round"/>
-              <line x1="14" y1="2" x2="22" y2="16" stroke="#777" stroke-width="3" stroke-linecap="round"/>
-              <circle cx="22" cy="32" r="18" fill="url(#s1)"/>
-              <circle cx="22" cy="32" r="14" fill="url(#s2)"/>
-              <circle cx="22" cy="32" r="10" fill="url(#s3)" opacity="0.5"/>
-              <path d="M22 24 L24 29 L30 29 L25 33 L27 38 L22 34 L17 38 L19 33 L14 29 L20 29 Z" fill="#c0c0c0" opacity="0.8"/>
-              <defs>
-                <radialGradient id="s1" cx="38%" cy="30%"><stop offset="0%" stop-color="#e8e8e8"/><stop offset="100%" stop-color="#606060"/></radialGradient>
-                <radialGradient id="s2" cx="38%" cy="30%"><stop offset="0%" stop-color="#d0d0d0"/><stop offset="100%" stop-color="#888"/></radialGradient>
-                <radialGradient id="s3" cx="30%" cy="25%"><stop offset="0%" stop-color="#ffffff" stop-opacity="0.9"/><stop offset="100%" stop-color="#aaaaaa" stop-opacity="0"/></radialGradient>
-              </defs>
-            </svg>
-            <div class="pf-medal-tooltip">Plata - Temp 2</div>
-          </div>
-          <!-- ORO -->
-          <div class="pf-medal gold">
-            <svg viewBox="0 0 44 52" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <line x1="22" y1="0" x2="22" y2="16" stroke="#b8860b" stroke-width="4" stroke-linecap="round"/>
-              <line x1="14" y1="2" x2="22" y2="16" stroke="#a07800" stroke-width="3" stroke-linecap="round"/>
-              <circle cx="22" cy="32" r="18" fill="url(#g1)"/>
-              <circle cx="22" cy="32" r="14" fill="url(#g2)"/>
-              <circle cx="22" cy="32" r="10" fill="url(#g3)" opacity="0.5"/>
-              <path d="M22 24 L24 29 L30 29 L25 33 L27 38 L22 34 L17 38 L19 33 L14 29 L20 29 Z" fill="#ffe066" opacity="0.95"/>
-              <defs>
-                <radialGradient id="g1" cx="38%" cy="30%"><stop offset="0%" stop-color="#ffe066"/><stop offset="100%" stop-color="#7a5500"/></radialGradient>
-                <radialGradient id="g2" cx="38%" cy="30%"><stop offset="0%" stop-color="#ffd020"/><stop offset="100%" stop-color="#b8860b"/></radialGradient>
-                <radialGradient id="g3" cx="30%" cy="25%"><stop offset="0%" stop-color="#ffffff" stop-opacity="0.9"/><stop offset="100%" stop-color="#ffd700" stop-opacity="0"/></radialGradient>
-              </defs>
-            </svg>
-            <div class="pf-medal-tooltip">Oro - Temp 3</div>
-          </div>
-          <!-- EPICO -->
-          <div class="pf-medal epic">
-            <svg viewBox="0 0 44 52" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <line x1="22" y1="0" x2="22" y2="16" stroke="#6c3483" stroke-width="4" stroke-linecap="round"/>
-              <line x1="14" y1="2" x2="22" y2="16" stroke="#5a2570" stroke-width="3" stroke-linecap="round"/>
-              <circle cx="22" cy="32" r="18" fill="url(#e1)"/>
-              <circle cx="22" cy="32" r="14" fill="url(#e2)"/>
-              <circle cx="22" cy="32" r="10" fill="url(#e3)" opacity="0.5"/>
-              <path d="M22 22 L24.5 27.5 L31 27.5 L26 31.5 L28 37.5 L22 33.5 L16 37.5 L18 31.5 L13 27.5 L19.5 27.5 Z" fill="#df9fff" opacity="0.95"/>
-              <defs>
-                <radialGradient id="e1" cx="38%" cy="30%"><stop offset="0%" stop-color="#c084fc"/><stop offset="100%" stop-color="#3b0f6c"/></radialGradient>
-                <radialGradient id="e2" cx="38%" cy="30%"><stop offset="0%" stop-color="#a040e0"/><stop offset="100%" stop-color="#6c3483"/></radialGradient>
-                <radialGradient id="e3" cx="30%" cy="25%"><stop offset="0%" stop-color="#ffffff" stop-opacity="0.8"/><stop offset="100%" stop-color="#c084fc" stop-opacity="0"/></radialGradient>
-              </defs>
-            </svg>
-            <div class="pf-medal-tooltip">Épico - Especial</div>
-          </div>
-          <!-- LEGENDARIO -->
-          <div class="pf-medal legend">
-            <svg viewBox="0 0 44 52" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <line x1="22" y1="0" x2="22" y2="16" stroke="#cc2200" stroke-width="4" stroke-linecap="round"/>
-              <line x1="14" y1="2" x2="22" y2="16" stroke="#aa1800" stroke-width="3" stroke-linecap="round"/>
-              <circle cx="22" cy="32" r="18" fill="url(#l1)"/>
-              <circle cx="22" cy="32" r="14" fill="url(#l2)"/>
-              <circle cx="22" cy="32" r="10" fill="url(#l3)" opacity="0.45"/>
-              <path d="M22 22 L24.5 27.5 L31 27.5 L26 31.5 L28 37.5 L22 33.5 L16 37.5 L18 31.5 L13 27.5 L19.5 27.5 Z" fill="#ffcc80" opacity="0.95"/>
-              <circle cx="32" cy="22" r="5" fill="url(#lfire)"/>
-              <path d="M32 18 Q34 20 32 24 Q30 20 32 18Z" fill="#fff" opacity="0.6"/>
-              <defs>
-                <radialGradient id="l1" cx="38%" cy="30%"><stop offset="0%" stop-color="#ff8040"/><stop offset="100%" stop-color="#6a0000"/></radialGradient>
-                <radialGradient id="l2" cx="38%" cy="30%"><stop offset="0%" stop-color="#ff5010"/><stop offset="100%" stop-color="#cc2200"/></radialGradient>
-                <radialGradient id="l3" cx="30%" cy="25%"><stop offset="0%" stop-color="#ffffff" stop-opacity="0.8"/><stop offset="100%" stop-color="#ff8040" stop-opacity="0"/></radialGradient>
-                <radialGradient id="lfire" cx="40%" cy="30%"><stop offset="0%" stop-color="#ffee00"/><stop offset="100%" stop-color="#ff4400"/></radialGradient>
-              </defs>
-            </svg>
-            <div class="pf-medal-tooltip">Legendario - Top 100</div>
-          </div>
-        </div>
-      </div>
+ <div class="pf-medals-section">
+  <div class="pf-medals-title">Medallas de Pase</div>
+  <div class="pf-medals-row">
+    <div class="pf-sakura-single-medal" id="pf-sakura-medal-icon">🌸</div>
+    <div class="pf-sakura-count-box">
+      <div class="pf-sakura-count" id="pf-sakura-count-display">0</div>
+      <div class="pf-sakura-count-label">Medallas Sakura</div>
     </div>
+  </div>
+</div>
 
     <!-- CENTER: 3D character -->
     <div class="pf-char-section">
