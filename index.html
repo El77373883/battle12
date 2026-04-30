@@ -2310,7 +2310,13 @@
         tab.classList.add('active');
       });
     });
-    profileTrigger.addEventListener('click', () => { profileOverlay.classList.add('active'); setTimeout(() => initProfileScene(), 50); });
+    profileTrigger.addEventListener('click', () => { 
+  profileOverlay.classList.add('active'); 
+  setTimeout(() => {
+    initProfileScene();
+    updateProfileMedals();
+  }, 50); 
+});
     closeProfileBtn.addEventListener('click', () => profileOverlay.classList.remove('active'));
 
     // ===== MUSIC =====
