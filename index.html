@@ -2853,6 +2853,22 @@
         obstacles.push({position: new THREE.Vector3(x, 0, z), radius: 2.5, height: tH});
       }
       
+      
+      
+      // ===== ÁRBOLES SAKURA (CEREZOS) =====
+      for (let i = 0; i < 40; i++) {
+        const sAngle = Math.random() * Math.PI * 2;
+        const sDist = 20 + Math.random() * 800;
+        const sx = Math.cos(sAngle) * sDist;
+        const sz = Math.sin(sAngle) * sDist;
+        
+        const sakura = createDetailedSakura(sx, sz);
+        sakura.userData.isTree = true;
+        scene.add(sakura);
+        obstacles.push({position: new THREE.Vector3(sx, 0, sz), radius: 3, height: 6});
+      }
+      
+      
       // ===== CASAS DETALLADAS =====
       const wallColors = [0xd4c5a9, 0xe8dcc8, 0xc8b89a, 0xbcad96, 0xd9cdb8];
       const roofColors = [0x7a3a1a, 0x9c4f1e, 0x5a2a10, 0x8b3a14, 0x6b2a0a];
@@ -3797,6 +3813,87 @@
       document.querySelectorAll('.inv-cat').forEach(c => c.classList.remove('cat-active'));
       renderInvGrid('coleccion');
     });
+    
+    
+    
+    function createDetailedSakura(x, z) {
+    const group = new THREE.Group();
+    group.userData.isTree = true;
+
+    // TRONCO PRINCIPAL
+    const trunkGeometry = new THREE.CylinderGeometry(0.2, 0.4, 4, 8);
+    const trunkMaterial = new THREE.MeshStandardMaterial({ 
+        color: 0x3d2b1f, 
+        roughness: 0.9,
+        metalness: 0.1,
+        flatShading: true
+    });
+    const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
+    trunk.position.y = 2;
+    trunk.castShadow = true;
+    group.add(trunk);
+
+    // RAMAS Y FLORES
+    const branchMaterial = new THREE.MeshStandardMaterial({ color: 0x3d2b1f, roughness: 0.8 });
+    
+    for (let i = 0; i < 6; i++) {
+        const branchHeight = 1.5 + Math.random() * 2;
+        const branch = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.05, 0.15, branchHeight, 5),
+            branchMaterial
+        );
+        branch.position.y = 2 + Math.random() * 1.5;
+        branch.rotation.z = (Math.random() - 0.5) * 1.5;
+        branch.rotation.x = (Math.random() - 0.5) * 1.5;
+        group.add(branch);
+
+        const flowerColors = [0xffb7c5, 0xff91af, 0xf77fbe, 0xffc0cb, 0xffd1dc, 0xff88aa];
+        
+        for (let j = 0; j < 30; j++) {
+            const flowerSize = 0.15 + Math.random() * 0.4;
+            const flowerGeo = new THREE.SphereGeometry(flowerSize, 5, 5);
+            const flowerMat = new THREE.MeshStandardMaterial({
+                color: flowerColors[Math.floor(Math.random() * flowerColors.length)],
+                roughness: 0.5,
+                transparent: true,
+                opacity: 0.9
+            });
+            const flower = new THREE.Mesh(flowerGeo, flowerMat);
+            flower.position.set(
+                branch.position.x + (Math.random() - 0.5) * 2.5,
+                branch.position.y + (Math.random() * 1.5),
+                branch.position.z + (Math.random() - 0.5) * 2.5
+            );
+            flower.castShadow = true;
+            group.add(flower);
+        }
+    }
+
+    // PÉTALOS EN EL SUELO
+    for (let p = 0; p < 12; p++) {
+        const petal = new THREE.Mesh(
+            new THREE.PlaneGeometry(0.12, 0.08),
+            new THREE.MeshStandardMaterial({ 
+                color: 0xffb7c5, 
+                side: THREE.DoubleSide,
+                transparent: true,
+                opacity: 0.7,
+                roughness: 0.8
+            })
+        );
+        petal.position.set(
+            (Math.random() - 0.5) * 3.5,
+            0.03, 
+            (Math.random() - 0.5) * 3.5
+        );
+        petal.rotation.x = -Math.PI / 2;
+        petal.rotation.z = Math.random() * Math.PI;
+        group.add(petal);
+    }
+
+    group.position.set(x, 0, z);
+    return group;
+}
     
     
     function spawnAirdropEvent() {
