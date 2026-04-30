@@ -2903,7 +2903,7 @@
       currentState = State.PLANE;
       if (lobbyModel) scene.remove(lobbyModel);
       planeGroup = createRealisticPlane();
-      planeGroup.position.set(-60,60,-60);
+      planeGroup.position.set(-400, 120, -400);
       planeGroup.rotation.y=Math.PI/4; planeGroup.rotation.z=-0.05; planeGroup.rotation.x=0.05;
       scene.add(planeGroup);
       localPlayer.inPlane = true;
@@ -3284,12 +3284,12 @@
         updateBullets(delta);
       }
 
-      // ---- PLANE ----
+    // ---- PLANE ----
       if (currentState === State.PLANE && planeGroup) {
-        planeGroup.position.x += 1.2; planeGroup.position.z += 1.2;
-        if (planeGroup.position.x > 55) planeGroup.position.x = -55;
-        if (planeGroup.position.z > 55) planeGroup.position.z = -55;
-        const targetPos = planeGroup.position.clone().add(new THREE.Vector3(0,8,18));
+        planeGroup.position.x += 6; planeGroup.position.z += 6;
+        if (planeGroup.position.x > 450) planeGroup.position.x = -450;
+        if (planeGroup.position.z > 450) planeGroup.position.z = -450;
+        const targetPos = planeGroup.position.clone().add(new THREE.Vector3(0, 40, 60));
         camera.position.lerp(targetPos, 0.1);
         camera.lookAt(planeGroup.position);
       }
