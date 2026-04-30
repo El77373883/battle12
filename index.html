@@ -899,18 +899,19 @@
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.35s ease;
-      background: #060a14;
+      background: rgba(6, 10, 20, 0.85);
       overflow: hidden;
     }
     #profile-overlay.active { opacity: 1; pointer-events: auto; }
-    .pf-bg-gradient {
-      position: absolute; inset: 0;
-      background:
-        radial-gradient(ellipse at 20% 50%, rgba(255,120,0,0.15) 0%, transparent 60%),
-        radial-gradient(ellipse at 80% 20%, rgba(0,100,255,0.12) 0%, transparent 50%),
-        linear-gradient(180deg, #06091a 0%, #0a0f20 60%, #06091a 100%);
-      z-index: 0;
-    }
+.pf-bg-gradient {
+  position: absolute; inset: 0;
+  background-image: url('https://archive.org/download/img-7196_202604/IMG_7196.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 0;
+  opacity: 0.45;
+}
     .pf-topbar {
       position: relative; z-index: 10;
       display: flex; align-items: center; justify-content: space-between;
@@ -1524,6 +1525,15 @@
           <div class="pf-stat-card"><div class="pf-stat-val">4.2</div><div class="pf-stat-lbl">K/D</div></div>
         </div>
       </div>
+      
+      <div class="pf-sakura-medals" id="pf-sakura-medals">
+  <div class="pf-sakura-medal-icon">🌸</div>
+  <div class="pf-sakura-medal-info">
+    <div class="pf-sakura-medal-count">0 / 200</div>
+    <div class="pf-sakura-medal-label">Medallas Sakura S1</div>
+  </div>
+  <div class="pf-sakura-medal-badge inactive">SIN PASE</div>
+</div>
       <div class="pf-medals-section">
         <div class="pf-medals-title">Medallas de Pase</div>
         <div class="pf-medals-row">
