@@ -2579,43 +2579,103 @@
         obstacles.push({position:new THREE.Vector3(x,0,z),radius:10,height});
       }
       
-      // ===== CÉSPED 3D =====
+      // ===== CÉSPED 3D DETALLADO =====
       const grassAreas = [];
-      // Crear 30 grupos de césped decorativo
-      for (let g = 0; g < 40; g++) {
+      // Crear 80 grupos de césped (el doble)
+      for (let g = 0; g < 80; g++) {
         const gAngle = Math.random() * Math.PI * 2;
-        const gDist = 5 + Math.random() * 80;
+        const gDist = 3 + Math.random() * 90;
         const gx = Math.cos(gAngle) * gDist;
         const gz = Math.sin(gAngle) * gDist;
         grassAreas.push({x: gx, z: gz});
       }
       
+      // Colores de césped más vivos y variados
+      const grassColors = [
+        new THREE.MeshStandardMaterial({color: 0x44bb2a, roughness: 0.5, side: THREE.DoubleSide}),
+        new THREE.MeshStandardMaterial({color: 0x55cc33, roughness: 0.4, side: THREE.DoubleSide}),
+        new THREE.MeshStandardMaterial({color: 0x33991a, roughness: 0.6, side: THREE.DoubleSide}),
+        new THREE.MeshStandardMaterial({color: 0x66dd44, roughness: 0.45, side: THREE.DoubleSide}),
+        new THREE.MeshStandardMaterial({color: 0x2a8a15, roughness: 0.7, side: THREE.DoubleSide}),
+        new THREE.MeshStandardMaterial({color: 0x88ee55, roughness: 0.35, side: THREE.DoubleSide}),
+      ];
+      
       grassAreas.forEach(pos => {
-  const grassGroup = new THREE.Group();
-  grassGroup.userData.isGrass = true; // MARCA DE IDENTIFICACIÓN
-        const grassMat1 = new THREE.MeshStandardMaterial({color: 0x2d6e1a, roughness: 0.8, side: THREE.DoubleSide});
-        const grassMat2 = new THREE.MeshStandardMaterial({color: 0x3a7a2a, roughness: 0.7, side: THREE.DoubleSide});
-        const grassMat3 = new THREE.MeshStandardMaterial({color: 0x1e5c1e, roughness: 0.9, side: THREE.DoubleSide});
+        const grassGroup = new THREE.Group();
+        grassGroup.userData.isGrass = true;
         
-        for (let j = 0; j < 15; j++) {
-          const bladeMat = [grassMat1, grassMat2, grassMat3][Math.floor(Math.random() * 3)];
-          const bladeGeo = new THREE.PlaneGeometry(0.15, 0.6 + Math.random() * 1.2);
+        // Más hojas por grupo (20 en vez de 15)
+        for (let j = 0; j < 20; j++) {
+          const bladeMat = grassColors[Math.floor(Math.random() * grassColors.length)];
+          // Hojas más grandes y variadas
+          const bladeGeo = new THREE.PlaneGeometry(0.12 + Math.random() * 0.2, 0.5 + Math.random() * 1.8);
           const blade = new THREE.Mesh(bladeGeo, bladeMat);
           
           blade.position.set(
-            (Math.random() - 0.5) * 1.5,
-            0.15 + Math.random() * 0.3,
-            (Math.random() - 0.5) * 1.5
+            (Math.random() - 0.5) * 2.0,
+            0.2 + Math.random() * 0.5,
+            (Math.random() - 0.5) * 2.0
           );
-          blade.rotation.y = Math.random() * Math.PI;
-          blade.rotation.z = (Math.random() - 0.5) * 0.3;
-          blade.rotation.x = (Math.random() - 0.5) * 0.3;
+          blade.rotation.y = Math.random() * Math.PI * 2;
+          blade.rotation.z = (Math.random() - 0.5) * 0.4;
+          blade.rotation.x = (Math.random() - 0.5) * 0.4;
           
           grassGroup.add(blade);
         }
-        grassGroup.position.set(pos.x, 0, pos.z);
+        grassGroup.position.set(pos.x, -0.05, pos.z);
         scene.add(grassGroup);
       });
+      
+      // ===== ROCAS DECORATIVAS =====
+      const rockColors = [0x888888, 0x999999, 0x777777, 0xaaaaaa, 0x666666, 0x8a8a7a, 0x9a9a8a];
+      for (let r = 0; r < 25; r++) {
+        const rAngle = Math.random() * Math.PI * 2;
+        const rDist = 5 + Math.random() * 85;
+        const rx = Math.cos(rAngle) * rDist;
+        const rz = Math.sin(rAngle) * rDist;
+        
+        const rockGroup = new THREE.Group();
+        rockGroup.userData.isRock = true;
+        
+        // Roca principal
+        const rockMat = new THREE.MeshStandardMaterial({
+          color: rockColors[Math.floor(Math.random() * rockColors.length)],
+          roughness: 0.7,
+          metalness: 0.1,
+          flatShading: true
+        });
+        
+        const mainRock = new THREE.Mesh(
+          new THREE.DodecahedronGeometry(0.3 + Math.random() * 1.2, 1),
+          rockMat
+        );
+        mainRock.position.set(0, 0.1, 0);
+        mainRock.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
+        mainRock.scale.set(
+          0.6 + Math.random() * 1.4,
+          0.4 + Math.random() * 0.8,
+          0.6 + Math.random() * 1.4
+        );
+        rockGroup.add(mainRock);
+        
+        // Piedritas alrededor
+        for (let s = 0; s < 3 + Math.floor(Math.random() * 5); s++) {
+          const smallRock = new THREE.Mesh(
+            new THREE.DodecahedronGeometry(0.1 + Math.random() * 0.3, 0),
+            rockMat.clone()
+          );
+          smallRock.position.set(
+            (Math.random() - 0.5) * 1.5,
+            0.05,
+            (Math.random() - 0.5) * 1.5
+          );
+          smallRock.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
+          rockGroup.add(smallRock);
+        }
+        
+        rockGroup.position.set(rx, 0, rz);
+        scene.add(rockGroup);
+      }
       
       // ===== REALISTIC TREES =====
       const treeColors = [0x2d6e2a, 0x1e5c1e, 0x3a7a30, 0x256325, 0x4a8c3f];
@@ -2961,8 +3021,9 @@
         scene.children.forEach(child => {
           if (child.isGroup && child.userData.isGrass) {
             child.children.forEach(blade => {
-              if (blade.isMesh && blade.geometry.type === 'PlaneGeometry') {
-                blade.rotation.z += Math.sin(lobbyTime * 3 + blade.position.x) * 0.002;
+              if (blade.isMesh && blade.geometry) {
+                blade.rotation.z += Math.sin(lobbyTime * 3 + blade.position.x) * 0.005;
+                blade.rotation.x += Math.cos(lobbyTime * 2.5 + blade.position.z) * 0.004;
               }
             });
           }
@@ -3026,13 +3087,13 @@
 
       // ---- PLAYING ----
       if (currentState === State.PLAYING && playerModel) {
-        // Movimiento del césped con viento en partida
+        // Movimiento del césped y rocas con viento
         scene.children.forEach(child => {
           if (child.isGroup && child.userData.isGrass) {
             child.children.forEach(blade => {
-              if (blade.isMesh && blade.geometry.type === 'PlaneGeometry') {
-                blade.rotation.z += Math.sin(lobbyTime * 2 + blade.position.x) * 0.003;
-                blade.rotation.x += Math.cos(lobbyTime * 2 + blade.position.z) * 0.002;
+              if (blade.isMesh && blade.geometry) {
+                blade.rotation.z += Math.sin(lobbyTime * 3 + blade.position.x) * 0.004;
+                blade.rotation.x += Math.cos(lobbyTime * 2.5 + blade.position.z) * 0.003;
               }
             });
           }
