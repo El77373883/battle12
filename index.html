@@ -3004,8 +3004,8 @@ function createDetailedSakura(x, z) {
 
     function updateLobbyCamera() {
   const isLandscape = window.innerWidth > window.innerHeight;
-  if (isLandscape) { camera.position.set(0, 30, 50); camera.lookAt(0, 0, 0); }
-  else { camera.position.set(0, 40, 45); camera.lookAt(0, 0, 0); }
+  if (isLandscape) { camera.position.set(0, 8, 15); camera.lookAt(0, 2, 0); }
+  else { camera.position.set(0, 8, 15); camera.lookAt(0, 2, 0); }
 }
 
     function setupLobbyFallback() {
@@ -3256,10 +3256,10 @@ function createDetailedSakura(x, z) {
             });
           }
         });
-        const camX = Math.sin(lobbyTime * 0.15) * 40;
-        const camZ = 50 + Math.cos(lobbyTime * 0.15) * 25;
-        camera.position.lerp(new THREE.Vector3(camX, 35, camZ), 0.015);
-        camera.lookAt(0, 0, 0);
+        const camX = Math.sin(lobbyTime * 0.3) * 3;
+        const camZ = 12 + Math.cos(lobbyTime * 0.3) * 2;
+        camera.position.lerp(new THREE.Vector3(camX, 6, camZ), 0.02);
+        camera.lookAt(0, 2.2, 0);
         // Nubes animadas
         if (typeof clouds !== 'undefined') {
           for (const c of clouds) {
