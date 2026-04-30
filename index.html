@@ -1790,6 +1790,32 @@
         camera.position.lerp(new THREE.Vector3(camX,3.5,camZ),0.03);
         camera.lookAt(0,2.2,0);
       }
+      
+            // ---- JUMPING / CAÍDA ----
+      if (currentState === State.JUMPING && playerModel) {
+        playerModel.position.y -= 8 * delta; // Velocidad de caída
+        
+        if (parachuteModel) {
+          parachuteModel.position.set(playerModel.position.x, playerModel.position.y + 0.5, playerModel.position.z);
+        }
+
+        // --- BLOQUE PARA BORRAR PARACAÍDAS AL TOCAR SUELO ---
+        if (playerModel.position.y <= 0) {
+          playerModel.position.y = 0;
+          currentState = State.PLAYING;
+          
+          if (parachuteModel) {
+            scene.remove(parachuteModel);
+            parachuteModel.traverse((child) => {
+              if (child.geometry) child.geometry.dispose();
+              if (child.material) child.material.dispose();
+            });
+            parachuteModel = null;
+            console.log("Aterrizaje exitoso: Paracaídas eliminado");
+          }
+        }
+      }
+
 
       // ---- PLAYING ----
       if (currentState === State.PLAYING && playerModel) {
