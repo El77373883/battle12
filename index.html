@@ -3897,46 +3897,37 @@ const PASE_REWARDS = [
 
 // Medallas en perfil
 function updateProfileMedals() {
-  const medalsSection = document.querySelector('.pf-medals-section');
-  if (!medalsSection) return;
+  // ===== ACTUALIZAR MEDALLA SAKURA SIMPLE (flor + número) =====
+  const medalIcon = document.getElementById('pf-sakura-medal-icon');
+  const countDisplay = document.getElementById('pf-sakura-count-display');
   
-  // Agregar sección de medallas Sakura después de las medallas existentes
-  let sakuraDiv = document.getElementById('pf-sakura-medals');
-  if (!sakuraDiv) {
-    sakuraDiv = document.createElement('div');
-    sakuraDiv.id = 'pf-sakura-medals';
-    sakuraDiv.className = 'pf-sakura-medals';
-    medalsSection.appendChild(sakuraDiv);
+  if (medalIcon && countDisplay) {
+    countDisplay.textContent = paseSakuraData.medals;
+    if (paseSakuraData.medals > 0) {
+      medalIcon.classList.add('has-medals');
+    } else {
+      medalIcon.classList.remove('has-medals');
+    }
   }
   
-  const florColor = paseSakuraData.active ? '#ffd700' : '#555555';
-  const florGlow  = paseSakuraData.active ? '0 0 14px rgba(255,210,0,0.8)' : 'none';
-  const florCenter= paseSakuraData.active ? '#fff8a0' : '#888';
-  sakuraDiv.innerHTML = `
-    <div class="pf-sakura-medal-icon" style="filter:drop-shadow(${florGlow})">
-      <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <ellipse cx="18" cy="9"  rx="5" ry="8" fill="${florColor}" transform="rotate(0 18 18)"/>
-        <ellipse cx="18" cy="9"  rx="5" ry="8" fill="${florColor}" transform="rotate(72 18 18)"/>
-        <ellipse cx="18" cy="9"  rx="5" ry="8" fill="${florColor}" transform="rotate(144 18 18)"/>
-        <ellipse cx="18" cy="9"  rx="5" ry="8" fill="${florColor}" transform="rotate(216 18 18)"/>
-        <ellipse cx="18" cy="9"  rx="5" ry="8" fill="${florColor}" transform="rotate(288 18 18)"/>
-        <circle cx="18" cy="18" r="6" fill="${florCenter}"/>
-        <circle cx="18" cy="18" r="3" fill="${paseSakuraData.active ? '#ffa500' : '#666'}"/>
-      </svg>
-    </div>
-    <div class="pf-sakura-medal-info">
-      <div class="pf-sakura-medal-count">${paseSakuraData.medals} / ${paseSakuraData.maxMedals}</div>
-      <div class="pf-sakura-medal-label">Medallas Sakura S1</div>
-    </div>
-    <div class="pf-sakura-medal-badge ${paseSakuraData.active ? 'active' : 'inactive'}">
-      ${paseSakuraData.active ? 'PASE ACTIVO' : 'SIN PASE'}
-    </div>
-  `;
+  // ===== ACTUALIZAR BADGE DE PASE SAKURA (ya existente en HTML) =====
+  const sakuraBadge = document.querySelector('#pf-sakura-medals .pf-sakura-medal-badge');
+  const sakuraCount = document.querySelector('#pf-sakura-medals .pf-sakura-medal-count');
+  
+  if (sakuraBadge && sakuraCount) {
+    sakuraCount.textContent = paseSakuraData.medals + ' / ' + paseSakuraData.maxMedals;
+    if (paseSakuraData.active) {
+      sakuraBadge.textContent = 'PASE ACTIVO';
+      sakuraBadge.className = 'pf-sakura-medal-badge active';
+    } else {
+      sakuraBadge.textContent = 'SIN PASE';
+      sakuraBadge.className = 'pf-sakura-medal-badge inactive';
+    }
+  }
   
   // Actualizar monedas en el top-bar
   updateCurrencyDisplay();
 }
-
 function updateCurrencyDisplay() {
   const diamondEl = document.querySelector('.currency-item[style*="00d4ff"]');
   const goldEl = document.querySelector('.currency-item[style*="ffd700"]');
