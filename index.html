@@ -3864,35 +3864,6 @@ window.selectPase = function(type) {
   }
 };
 
-// Renderizar recompensas
-function renderPaseRewards() {
-  const grid = document.getElementById('pase-rewards-grid');
-  if (!grid) return;
-  grid.innerHTML = '';
-  
-  PASE_REWARDS.forEach(reward => {
-    const div = document.createElement('div');
-    const isClaimed = localStorage.getItem('pase_claimed_' + reward.level) === 'true';
-    const canClaim = paseSakuraData.level >= reward.level && !isClaimed;
-    
-    div.className = 'pase-reward-item';
-    if (isClaimed) div.classList.add('claimed');
-    if (canClaim) div.classList.add('current');
-    
-    div.innerHTML = `
-      <div class="pase-reward-img">
-        ${reward.img ? `<img src="${reward.img}" alt="${reward.name}" onerror="this.innerHTML='<span style=font-size:28px>${reward.icon}</span>'">` : `<span style="font-size:28px">${reward.icon}</span>`}
-      </div>
-      <div class="pase-reward-name">${reward.name}</div>
-      <div class="pase-reward-level">Nv.${reward.level}</div>
-      ${isClaimed ? 
-        '<button class="pase-reward-btn claimed">RECLAMADO ✓</button>' : 
-        `<button class="pase-reward-btn" onclick="claimRewardById(${reward.level})" ${!canClaim ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : ''}>RECLAMAR</button>`
-      }
-    `;
-    grid.appendChild(div);
-  });
-}
 
 
 function renderPaseRewards() {
