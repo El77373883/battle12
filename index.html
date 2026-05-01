@@ -817,7 +817,7 @@
     /* ===== GAMEPLAY JUMP BUTTON ===== */
     #gp-jump-btn {
       position: absolute;
-      bottom: 130px;
+      bottom: 115px;
       right: 22px;
       width: 70px; height: 70px;
       background: radial-gradient(circle at 38% 35%, #66bbff, #0066dd);
@@ -930,8 +930,8 @@
       #music-toggle { bottom: 110px; }
       .top-bar { top: max(8px, env(safe-area-inset-top)); }
       #ingame-hud { bottom: 110px; left: 145px; }
-      #fire-btn { bottom: 70px; }
-      #gp-jump-btn { bottom: 165px; }
+      #fire-btn { bottom: 16px; right: 16px; }
+      #gp-jump-btn { bottom: 112px; right: 22px; }
     }
 
     /* ============ PROFILE OVERLAY - FREE FIRE STYLE ============ */
@@ -1298,7 +1298,7 @@
 
     /* ===== ADS / CROUCH / LOOT BUTTONS ===== */
     #ads-btn {
-      position: absolute; bottom: 155px; right: 20px;
+      position: absolute; bottom: 115px; right: 100px;
       width: 60px; height: 60px;
       background: rgba(0,180,255,0.25);
       border: 2px solid rgba(0,200,255,0.6);
@@ -1311,7 +1311,7 @@
     #ads-btn.active { background: rgba(255,200,0,0.35); border-color: #ffd700; }
     #ads-btn:active { transform: scale(0.92); }
     #crouch-btn {
-      position: absolute; bottom: 230px; right: 20px;
+      position: absolute; bottom: 195px; right: 26px;
       width: 55px; height: 55px;
       background: rgba(100,100,100,0.3);
       border: 2px solid rgba(200,200,200,0.5);
@@ -1335,7 +1335,7 @@
     }
     @keyframes lootPulse { 0%,100%{box-shadow:0 0 20px rgba(255,150,0,0.7)} 50%{box-shadow:0 0 35px rgba(255,150,0,1)} }
     #weapon-hud {
-      position: absolute; bottom: 155px; right: 90px;
+      position: absolute; bottom: 115px; right: 168px;
       background: rgba(0,0,0,0.75);
       border: 1px solid rgba(255,255,255,0.25);
       border-radius: 12px; padding: 7px 12px;
