@@ -2585,7 +2585,7 @@
         const box = new THREE.Box3().setFromObject(profileCarModel);
         const size = box.getSize(new THREE.Vector3());
         const maxDim = Math.max(size.x, size.y, size.z);
-        profileCarModel.scale.setScalar(1.8 / maxDim);
+        profileCarModel.scale.setScalar(4.5 / maxDim);
         // Detrás y a la derecha del personaje en el perfil
         profileCarModel.position.set(1.4, -0.12, -1.2);
         profileCarModel.rotation.y = -0.7;
