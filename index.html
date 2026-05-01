@@ -747,10 +747,10 @@
     }
     #minimap-container {
       position: absolute;
-      top: max(80px, env(safe-area-inset-top));
-      right: 15px;
-      width: 110px;
-      height: 110px;
+      bottom: 175px;
+      left: 155px;
+      width: 95px;
+      height: 95px;
       background: rgba(0,0,0,0.85);
       border-radius: 12px;
       border: 2px solid rgba(255,255,255,0.5);
@@ -1297,9 +1297,9 @@
 
 
     /* ===== ADS / CROUCH / LOOT BUTTONS ===== */
-    #ads-btn {
-      position: absolute; bottom: 115px; right: 100px;
-      width: 60px; height: 60px;
+      #ads-btn {
+      position: absolute; bottom: 114px; right: 98px;
+      width: 56px; height: 56px;
       background: rgba(0,180,255,0.25);
       border: 2px solid rgba(0,200,255,0.6);
       border-radius: 50%; color: white; font-size: 10px; font-weight: 800;
@@ -1508,14 +1508,13 @@
     <div id="jump-btn">SALTAR</div>
 
     <!-- NUEVOS BOTONES DE GAMEPLAY -->
-    <div id="fire-btn">
-      <span class="btn-icon">🔫</span>
-      <span>FIRE</span>
+<div id="fire-btn">
+      <span style="font-size:11px;font-weight:900;letter-spacing:1px;">FIRE</span>
     </div>
-    <div id="gp-jump-btn">
-      <span class="btn-icon">⬆️</span>
-      <span>JUMP</span>
+<div id="gp-jump-btn">
+      <span style="font-size:10px;font-weight:900;letter-spacing:1px;">SALTAR</span>
     </div>
+
 
     <!-- HUD EN JUEGO -->
     <div id="ingame-hud">
@@ -1559,11 +1558,11 @@
     <canvas id="viewmodel-canvas"></canvas>
 
     <!-- ADS / CROUCH / LOOT / WEAPON HUD -->
-    <div id="ads-btn"><span style="font-size:16px;">🔭</span><span>ADS</span></div>
-    <div id="crouch-btn"><span style="font-size:18px;">🦆</span><span>AGACHAR</span></div>
-    <div id="loot-btn">🎁 RECOGER</div>
+  <div id="ads-btn"><span style="font-size:10px;font-weight:900;letter-spacing:1px;">MIRA</span></div>
+    <div id="crouch-btn"><span style="font-size:9px;font-weight:900;letter-spacing:1px;">AGACHAR</span></div>
+ <div id="loot-btn">+ RECOGER</div>
     <div id="weapon-hud">
-      <div id="weapon-icon-big">🔫</div>
+<div id="weapon-icon-big" style="font-size:13px;color:rgba(255,255,255,0.5);">--</div>
       <div id="weapon-name-txt">SIN ARMA</div>
       <div id="weapon-ammo-txt">-- / --</div>
     </div>
