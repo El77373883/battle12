@@ -4146,7 +4146,11 @@ function createDetailedSakura(x, z) {
       const lg = scene.getObjectByName('lobbyGround');
       if (lg) scene.remove(lg);
       planeGroup = createRealisticPlane();
-      planeGroup.position.set(-450, 140, -450);
+      // ✅ DESPUÉS - Avión más lento y con trayectoria predefinida
+planeGroup.position.set(-400, 120, -400);
+planeGroup.rotation.y = Math.PI/4;
+planeGroup.userData.speed = 25; // Velocidad ajustable
+planeGroup.userData.flightPath = 'diagonal'; // Tipo de trayectoria
       planeGroup.rotation.y = Math.PI/4;
       planeTime = 0;
       planeFireParticles = []; planeSmokeParticles = []; planeSparks = [];
@@ -4595,10 +4599,31 @@ camera.lookAt(0, 2, 0);
       }
 
     // ---- PLANE ----
-      if (currentState === State.PLANE && planeGroup) {
-        planeGroup.position.x += 7; planeGroup.position.z += 7;
-        if (planeGroup.position.x > 500) planeGroup.position.x = -500;
-        if (planeGroup.position.z > 500) planeGroup.position.z = -500;
+      // ---- PLANE ----
+if (currentState === State.PLANE && planeGroup) {
+    const planeSpeed = planeGroup.userData.speed || 30;
+    const speedX = planeSpeed * delta;
+    const speedZ = planeSpeed * delta;
+    
+    planeGroup.position.x += speedX;
+    planeGroup.position.z += speedZ;
+    
+    // Movimiento ondulante suave
+    const waveAmplitude = 8;
+    const waveFrequency = 0.3;
+    planeGroup.position.y += Math.sin(planeTime * waveFrequency) * waveAmplitude * delta;
+    planeGroup.position.y = Math.max(100, Math.min(160, planeGroup.position.y)); // Mantener altura
+    
+    // Rotación suave en curvas
+    planeGroup.rotation.z = Math.sin(planeTime * 0.5) * 0.03;
+    planeGroup.rotation.x = 0.05 + Math.sin(planeTime * 0.7) * 0.02;
+    
+    // Reset cuando sale del mapa
+    if (planeGroup.position.x > 500 || planeGroup.position.z > 500) {
+        planeGroup.position.x = -450 + Math.random() * 100;
+        planeGroup.position.z = -450 + Math.random() * 100;
+        planeGroup.position.y = 120 + Math.random() * 30;
+    }
         // Camera follows with cinematic offset — moves around the plane
         const camAngle = planeTime * 0.18;
         const camDist = 55 + Math.sin(planeTime * 0.4) * 8;
@@ -5671,6 +5696,168 @@ function createDust(pos) {
         p.userData.maxLife = p.userData.life;
         scene.add(p);
         smokeParticles.push(p);
+    }
+}
+
+
+// ===== NUEVOS EFECTOS VISUALES PARA EL AVIÓN =====
+
+// Sistema de estela de humo
+let contrailParticles = [];
+let contrailSystem = null;
+
+function createContrailSystem() {
+    const group = new THREE.Group();
+    const particles = [];
+    
+    // Crear 50 partículas de estela
+    for (let i = 0; i < 50; i++) {
+        const size = 0.3 + Math.random() * 0.8;
+        const geo = new THREE.SphereGeometry(size, 4, 4);
+        const mat = new THREE.MeshBasicMaterial({
+            color: 0xffffff,
+            transparent: true,
+            opacity: 0.4 + Math.random() * 0.3
+        });
+        const particle = new THREE.Mesh(geo, mat);
+        particle.visible = false;
+        particle.userData = {
+            life: 0,
+            maxLife: 3 + Math.random() * 4,
+            velocity: new THREE.Vector3(
+                (Math.random() - 0.5) * 0.5,
+                (Math.random() - 0.5) * 0.3,
+                (Math.random() - 0.5) * 0.5
+            )
+        };
+        group.add(particle);
+        particles.push(particle);
+    }
+    
+    return { group, particles };
+}
+
+function updateContrail(delta, planePosition) {
+    if (!contrailSystem) {
+        const { group, particles } = createContrailSystem();
+        contrailSystem = { group, particles, nextSpawn: 0 };
+        scene.add(group);
+    }
+    
+    const { particles, group } = contrailSystem;
+    group.position.set(0, 0, 0);
+    
+    // Spawn nuevas partículas
+    contrailSystem.nextSpawn -= delta;
+    if (contrailSystem.nextSpawn <= 0) {
+        contrailSystem.nextSpawn = 0.15; // Cada 0.15 segundos
+        
+        for (const particle of particles) {
+            if (!particle.visible) {
+                // Posicionar detrás de los motores
+                const offsetX = (Math.random() - 0.5) * 4;
+                const offsetY = (Math.random() - 0.5) * 2;
+                const offsetZ = -8 - Math.random() * 3;
+                
+                particle.position.copy(planePosition);
+                particle.position.x += offsetX;
+                particle.position.y += offsetY;
+                particle.position.z += offsetZ;
+                
+                particle.userData.life = particle.userData.maxLife;
+                particle.material.opacity = 0.6;
+                particle.scale.setScalar(0.3);
+                particle.visible = true;
+                break;
+            }
+        }
+    }
+    
+    // Actualizar partículas existentes
+    for (const particle of particles) {
+        if (particle.visible) {
+            particle.userData.life -= delta;
+            
+            if (particle.userData.life <= 0) {
+                particle.visible = false;
+            } else {
+                const lifeRatio = particle.userData.life / particle.userData.maxLife;
+                
+                // Expandir y desvanecer
+                particle.scale.setScalar(1 + (1 - lifeRatio) * 4);
+                particle.material.opacity = lifeRatio * 0.4;
+                
+                // Movimiento
+                particle.position.add(particle.userData.velocity.clone().multiplyScalar(delta));
+                particle.position.y += delta * 0.2;
+                
+                // Cambiar color de blanco a gris
+                const gray = 0.5 + lifeRatio * 0.5;
+                particle.material.color.setRGB(gray, gray, gray);
+            }
+        }
+    }
+}
+
+// Luces de navegación mejoradas
+let navLightTimers = { left: 0, right: 0, strobe: 0 };
+
+function updateNavLights(delta, planeGroup) {
+    if (!planeGroup) return;
+    
+    const S = planeGroup.userData.S || 2.5;
+    
+    // Luz roja izquierda (parpadeo lento)
+    navLightTimers.left += delta;
+    if (navLightTimers.left > 0.8) {
+        navLightTimers.left = 0;
+        const leftLight = new THREE.PointLight(0xff0000, 5, 15);
+        const leftPos = new THREE.Vector3(-11 * S, -0.3 * S, -0.5 * S);
+        planeGroup.localToWorld(leftPos);
+        leftLight.position.copy(leftPos);
+        scene.add(leftLight);
+        setTimeout(() => scene.remove(leftLight), 200);
+    }
+    
+    // Luz verde derecha (parpadeo lento)
+    navLightTimers.right += delta;
+    if (navLightTimers.right > 0.8) {
+        navLightTimers.right = 0;
+        const rightLight = new THREE.PointLight(0x00ff00, 5, 15);
+        const rightPos = new THREE.Vector3(11 * S, -0.3 * S, -0.5 * S);
+        planeGroup.localToWorld(rightPos);
+        rightLight.position.copy(rightPos);
+        scene.add(rightLight);
+        setTimeout(() => scene.remove(rightLight), 200);
+    }
+    
+    // Luz estroboscópica blanca (parpadeo rápido)
+    navLightTimers.strobe += delta;
+    if (navLightTimers.strobe > 0.3) {
+        navLightTimers.strobe = 0;
+        const strobeLight = new THREE.PointLight(0xffffff, 8, 20);
+        const strobePos = new THREE.Vector3(0, 1.5 * S, 0);
+        planeGroup.localToWorld(strobePos);
+        strobeLight.position.copy(strobePos);
+        scene.add(strobeLight);
+        setTimeout(() => scene.remove(strobeLight), 100);
+    }
+}
+
+// Sistema de partículas de motor
+function updateEngineGlow(delta, planeGroup) {
+    if (!planeGroup) return;
+    
+    // Actualizar brillo de motores existentes
+    if (planeEngineGlows) {
+        planeEngineGlows.forEach((glow, i) => {
+            glow.intensity = 2 + Math.sin(planeTime * 3 + i) * 0.5;
+            // Motor dañado parpadea más
+            if (i === 1) {
+                glow.intensity = 3 + Math.sin(planeTime * 8) * 2 + Math.random() * 1.5;
+                glow.color.setHex(Math.random() < 0.2 ? 0xff2200 : 0xff6600);
+            }
+        });
     }
 }
 
