@@ -4182,25 +4182,25 @@ planeGroup.userData.flightPath = 'diagonal'; // Tipo de trayectoria
       joystickContainer.style.display = 'block';
       currentState = State.PLAYING;
       if (planeGroup) {
-        scene.remove(planeGroup); planeGroup = null;
-        planeFireParticles.forEach(p=>scene.remove(p)); planeFireParticles=[];
-        planeSmokeParticles.forEach(p=>scene.remove(p)); planeSmokeParticles=[];
-        planeSparks.forEach(p=>scene.remove(p)); planeSparks=[];
-      }
+    scene.remove(planeGroup); 
+    planeGroup = null;
+}
+
+// Limpiar estela de humo del avión
+if (contrailSystem && contrailSystem.group) {
+    scene.remove(contrailSystem.group);
+    contrailSystem = null;
+}
+contrailParticles = [];
+
+// Limpiar efectos de fuego
+planeFireParticles.forEach(p=>scene.remove(p)); 
+planeFireParticles=[];
+planeSmokeParticles.forEach(p=>scene.remove(p)); 
+planeSmokeParticles=[];
+planeSparks.forEach(p=>scene.remove(p)); 
+planeSparks=[];
       if (playerModel) scene.remove(playerModel);
-
-// Cámara cinemática mejorada
-const camAngle = planeTime * 0.12;  // Más lento para vista panorámica
-const camDist = 50 + Math.sin(planeTime * 0.25) * 5;
-const camH = 20 + Math.sin(planeTime * 0.35) * 3;
-const camOff = new THREE.Vector3(
-    Math.sin(camAngle) * camDist,
-    camH,
-    Math.cos(camAngle) * camDist * 0.7
-);
-camera.position.lerp(planeGroup.position.clone().add(camOff), 0.03); // Transición más suave
-camera.lookAt(planeGroup.position.x, planeGroup.position.y + 1.5, planeGroup.position.z);
-
 
       // Show gameplay buttons
       fireBtn.style.display = 'flex';
