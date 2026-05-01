@@ -4189,6 +4189,19 @@ planeGroup.userData.flightPath = 'diagonal'; // Tipo de trayectoria
       }
       if (playerModel) scene.remove(playerModel);
 
+// Cámara cinemática mejorada
+const camAngle = planeTime * 0.12;  // Más lento para vista panorámica
+const camDist = 50 + Math.sin(planeTime * 0.25) * 5;
+const camH = 20 + Math.sin(planeTime * 0.35) * 3;
+const camOff = new THREE.Vector3(
+    Math.sin(camAngle) * camDist,
+    camH,
+    Math.cos(camAngle) * camDist * 0.7
+);
+camera.position.lerp(planeGroup.position.clone().add(camOff), 0.03); // Transición más suave
+camera.lookAt(planeGroup.position.x, planeGroup.position.y + 1.5, planeGroup.position.z);
+
+
       // Show gameplay buttons
       fireBtn.style.display = 'flex';
       gpJumpBtn.style.display = 'flex';
@@ -4598,8 +4611,7 @@ camera.lookAt(0, 2, 0);
         renderViewmodel(delta);
       }
 
-    // ---- PLANE ----
-      // ---- PLANE ----
+// ---- PLANE ----
 if (currentState === State.PLANE && planeGroup) {
     const planeSpeed = planeGroup.userData.speed || 30;
     const speedX = planeSpeed * delta;
@@ -4612,7 +4624,7 @@ if (currentState === State.PLANE && planeGroup) {
     const waveAmplitude = 8;
     const waveFrequency = 0.3;
     planeGroup.position.y += Math.sin(planeTime * waveFrequency) * waveAmplitude * delta;
-    planeGroup.position.y = Math.max(100, Math.min(160, planeGroup.position.y)); // Mantener altura
+    planeGroup.position.y = Math.max(100, Math.min(160, planeGroup.position.y));
     
     // Rotación suave en curvas
     planeGroup.rotation.z = Math.sin(planeTime * 0.5) * 0.03;
@@ -4624,20 +4636,27 @@ if (currentState === State.PLANE && planeGroup) {
         planeGroup.position.z = -450 + Math.random() * 100;
         planeGroup.position.y = 120 + Math.random() * 30;
     }
-        // Camera follows with cinematic offset — moves around the plane
-        const camAngle = planeTime * 0.18;
-        const camDist = 55 + Math.sin(planeTime * 0.4) * 8;
-        const camH = 22 + Math.sin(planeTime * 0.25) * 6;
-        const camOff = new THREE.Vector3(
-          Math.sin(camAngle) * camDist,
-          camH,
-          Math.cos(camAngle) * camDist
-        );
-        camera.position.lerp(planeGroup.position.clone().add(camOff), 0.06);
-        camera.lookAt(planeGroup.position.x, planeGroup.position.y + 2, planeGroup.position.z);
-        // Epic plane effects
-        updatePlaneEffects(delta, planeGroup);
-      }
+    
+    // ✅ NUEVOS EFECTOS VISUALES INTEGRADOS
+    updateContrail(delta, planeGroup.position);
+    updateNavLights(delta, planeGroup);
+    updateEngineGlow(delta, planeGroup);
+    
+    // Efectos de fuego existentes
+    updatePlaneEffects(delta, planeGroup);
+    
+    // Cámara cinemática
+    const camAngle = planeTime * 0.15; // Más lento que antes (era 0.18)
+    const camDist = 55 + Math.sin(planeTime * 0.4) * 8;
+    const camH = 22 + Math.sin(planeTime * 0.25) * 6;
+    const camOff = new THREE.Vector3(
+        Math.sin(camAngle) * camDist,
+        camH,
+        Math.cos(camAngle) * camDist
+    );
+    camera.position.lerp(planeGroup.position.clone().add(camOff), 0.06);
+    camera.lookAt(planeGroup.position.x, planeGroup.position.y + 2, planeGroup.position.z);
+}
 
       // ---- MINIMAP ----
       if (currentState === State.PLAYING || currentState === State.PLANE) {
